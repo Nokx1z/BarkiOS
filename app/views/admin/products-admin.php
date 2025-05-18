@@ -20,16 +20,68 @@ $controller->handleRequest(); // maneja add/delete/truncate
     <!-- Favicon -->
     <link rel="shortcut icon" href="/assets/icons/Logo - Garage Barki.webp" type="image/x-icon">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../assets/css/admin-styles.css">
+    <link rel="stylesheet" href="../../../public/assets/css/admin-styles.css">
 </head>
 <body>
+
+        <nav class="sidebar" id="sidebar">
+        <div class="sidebar-sticky">
+            <div class="sidebar-header">
+                <h3>GARAGE<span>BARKI</span></h3>
+                <p class="mb-0">Panel de Administración</p>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="productos.html">
+                        <i class="fas fa-tshirt"></i>
+                        Productos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="ordenes.html">
+                        <i class="fas fa-shopping-cart"></i>
+                        Órdenes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-users"></i>
+                        Clientes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-chart-bar"></i>
+                        Reportes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-cog"></i>
+                        Configuración
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a class="nav-link" href="login.html">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </nav>
 
     <!-- Main Content -->
     <div class="main-content">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="display-6 fw-bold text-dark">GARAGE<span class="text-dark">BARKI</span></h1>
-                <p class="lead text-muted">Panel de Administración de Productos</p>
             </div>
             <button class="btn btn-primary rounded-pill px-4 me-3" data-bs-toggle="modal" data-bs-target="#addProductModal">
                 <i class="fas fa-plus me-1"></i> Añadir Producto
