@@ -127,7 +127,7 @@ $controller->handleRequest(); // maneja add/delete/truncate
                                             <td><?= htmlspecialchars($product['categoria'] ?? '') ?></td>
                                             <td>$<?= number_format($product['precio'] ?? 0, 2) ?></td>
                                             <td>
-                                                <a href="index.php?action=delete&id=<?= $product['id'] ?>" 
+                                                <a href="index.php?action=delete&id=<?= $product['codigo'] ?>" 
                                                    class="btn btn-sm btn-outline-danger"
                                                    onclick="return confirm('¿Estás seguro de eliminar este producto?')">
                                                     <i class="fas fa-trash"></i> Eliminar
