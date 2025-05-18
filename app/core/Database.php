@@ -1,45 +1,33 @@
 <?php
-namespace App\Core;
-
-class Database
-{
+class Database {
     private static $instance = null;
     private $pdo;
 
-    private function __construct()
-    {
-        $config = require __DIR__ . '/../../config/database.php';
-        
+    private function __construct() {
         try {
-            $this->pdo = new \PDO(
-                "mysql:host={$config['host']};dbname={$config['dbname']};charset=utf8",
-                $config['user'],
-                $config['password'],
+            $this->pdo = new PDO(
+                'mysql:host=barkios-db;dbname=barkios_db;charset=utf8',
+                'barkios_admin',
+                'barkios_pass123',
                 [
-                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-                    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-                    \PDO::ATTR_EMULATE_PREPARES => false
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
                 ]
             );
-        } catch (\PDOException $e) {
-            throw new \PDOException($e->getMessage(), (int)$e->getCode());
+        } catch (PDOException $e) {
+            die("Error de conexión: " . $e->getMessage());
         }
     }
 
-    public static function getInstance()
-    {
+    public static function getInstance() {
         if (self::$instance === null) {
-            self::$instance = new self();
+            self::$instance = new Database();
         }
         return self::$instance;
     }
 
-    public function getConnection()
-    {
+    // Método para obtener la conexión PDO directamente
+    public function getConnection() {
         return $this->pdo;
     }
-
-    // Evita la clonación del singleton
-    private function __clone() {}
-    private function __wakeup() {}
 }
