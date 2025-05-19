@@ -151,7 +151,7 @@ switch ($action) {
                                         <tr>
                                             <td><?= htmlspecialchars($client['cedula'] ?? '') ?></td>
                                             <td><?= htmlspecialchars($client['nombre'] ?? '') ?></td>
-                                            <td>$<?= number_format($client['direccion'] ?? '') ?></td>
+                                            <td>$<?= htmlspecialchars($client['direccion'] ?? '') ?></td>
                                             <td>$<?= number_format($client['telefono'] ?? '') ?></td>
                                             <td>$<?= htmlspecialchars($client['membresia'] ?? '') ?></td>
                                             <td>
