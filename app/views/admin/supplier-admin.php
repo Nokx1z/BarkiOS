@@ -1,32 +1,39 @@
 <?php
 // Incluimos el controlador y obtenemos los productos
-require_once __DIR__.'/../../controllers/Admin/ClientsController.php';
+require_once __DIR__.'/../../controllers/Admin/supplierController.php';
 
-$controller = new ClientsController();
+$controller = new SupplierController();
 
 $action = $_GET['action'] ?? null;
 
 switch ($action) {
     case 'delete':
         if (isset($_GET['id'])) {
-            $controller->deleteClient($_GET['id']);
-            header('Location: clients-admin.php?success=delete');
+            $controller->deleteSupplier($_GET['id']);
+            header('Location: supplier-admin.php?success=delete');
             exit;
         }
         break;
 
     case 'add':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $controller->addClient($_POST['cedula'], $_POST['nombre'], $_POST['dirección'], $_POST['telefono'], $_POST['membresia']);
-            header('Location: clients-admin.php?success=add');
+            $controller->addSupplier(
+            $_POST['id'], 
+            $_POST['nombre_contacto'],
+            $_POST['nombre_empresa'], 
+            $_POST['direccion'], 
+            $_POST['tipo_rif']);
+            header('Location: supplier-admin.php?success=add');
             exit;
         }
         break;
 
     default:
-        $clientes = $controller->getclientss();
+        $supplier = $controller->getSupplierr();
         break;
-}
+
+
+}// maneja add/delete/truncate
 ?>
 
 <!DOCTYPE html>
@@ -34,7 +41,7 @@ switch ($action) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clientes - Garage Barki</title>
+    <title>Productos - Garage Barki</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -45,7 +52,6 @@ switch ($action) {
     <link rel="shortcut icon" href="/assets/icons/Logo - Garage Barki.webp" type="image/x-icon">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../../../public/assets/css/admin-styles.css">
-    <link rel="shortcut icon" href="../../../public/assets/icons/Logo - Garage Barki.webp" type="image/x-icon">
 </head>
 <body>
 
@@ -63,19 +69,19 @@ switch ($action) {
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="client$clientos.html">
+                    <a class="nav-link" href="productos.html">
                         <i class="fas fa-tshirt"></i>
-                        client$clientos
+                        Productos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="ordenes.html">
+                    <a class="nav-link active" href="ordenes.html">
                         <i class="fas fa-shopping-cart"></i>
                         Órdenes
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">
+                    <a class="nav-link" href="#">
                         <i class="fas fa-users"></i>
                         Clientes
                     </a>
@@ -106,58 +112,50 @@ switch ($action) {
     <div class="main-content">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="display-6 fw-bold text-dark">GARAGE<span class="text-dark">BARKI</span></h1>
+                <h1 class="display-6 fw-bold text-dark">Proveedores</h1>
             </div>
-            <button class="btn btn-primary rounded-pill px-4 me-3" data-bs-toggle="modal" data-bs-target="#addclient$clientModal">
-                <i class="fas fa-plus me-1"></i> Añadir Cliente
+            <button class="btn btn-primary rounded-pill px-4 me-3" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                <i class="fas fa-plus me-1"></i> Agregar contacto
             </button>
             
-        <form action="clients-admin.php?action=truncate" method="POST" 
-            onsubmit="return confirm('¿Estás seguro de que deseas eliminar TODOS los clientes y reiniciar el ID?');" 
-            style="display:inline-block;">
-            <button type="submit" class="btn btn-danger rounded-pill px-4">
-            <i class="fas fa-trash-alt me-1"></i> Reiniciar Tabla
-            </button>
-        </form>
             <!-- Mensajes de éxito/error -->
             <?php if (isset($_GET['success'])): ?>
                 <div class="alert alert-success mt-3">
                     <?php 
                     switch($_GET['success']) {
-                        case 'add': echo 'Cliente agregado correctamente'; break;
-                        case 'delete': echo 'Cliente eliminado correctamente'; break;
+                        case 'add': echo 'Producto agregado correctamente'; break;
+                        case 'delete': echo 'Producto eliminado correctamente'; break;
                     }
                     ?>
                 </div>
             <?php endif; ?>
 
-            <!-- Tabla de Clientes -->
+            <!-- Tabla de Productos -->
             <div class="card mt-3">
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle text-center" >
                             <thead>
                                 <tr>
-                                    <th>Cédula</th>
-                                    <th>Nombre</th>
+                                    <th>Rif</th>
+                                    <th>Contacto</th>
+                                    <th>Empresa</th>
                                     <th>Dirección</th>
-                                    <th>Número de Teléfono</th>
-                                    <th>Membresía</th>
+                                    <th>Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if (!empty($clientss)): ?>
-                                    <?php foreach ($clientss as $client): ?>
+                                <?php if (!empty($supplier)): ?>
+                                    <?php foreach ($supplier as $supplier): ?>
                                         <tr>
-                                            <td><?= htmlspecialchars($client['cedula'] ?? '') ?></td>
-                                            <td><?= htmlspecialchars($client['nombre'] ?? '') ?></td>
-                                            <td>$<?= number_format($client['direccion'] ?? '') ?></td>
-                                            <td>$<?= number_format($client['telefono'] ?? '') ?></td>
-                                            <td>$<?= htmlspecialchars($client['membresia'] ?? '') ?></td>
+                                            <td><?= htmlspecialchars($supplier['tipo_rif'] ?? '') ?>-<?= htmlspecialchars($supplier['id'] ?? '') ?></td>
+                                            <td><?= htmlspecialchars($supplier['nombre_contacto'] ?? '') ?></td>
+                                            <td><?= htmlspecialchars($supplier['nombre_empresa'] ?? '') ?></td>
+                                            <td><?= htmlspecialchars($supplier['direccion'] ?? '') ?></td>
                                             <td>
-                                                <a href="index.php?action=delete&id=<?= $client['cedula'] ?>" 
+                                                <a href="supplier-admin.php?action=delete&id=<?= $supplier['id'] ?>"
                                                    class="btn btn-sm btn-outline-danger"
-                                                   onclick="return confirm('¿Estás seguro de eliminar a este cliente?')">
+                                                   onclick="return confirm('¿Estás seguro de eliminar este producto?')">
                                                     <i class="fas fa-trash"></i> Eliminar
                                                 </a>
                                             </td>
@@ -165,8 +163,8 @@ switch ($action) {
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="6" class="text-center">
-                                            <div class="alert alert-info mb-0">No hay clientes disponibles</div>
+                                        <td colspan="5" class="text-center">
+                                            <div class="alert alert-info mb-0">No hay productos disponibles</div>
                                         </td>
                                     </tr>
                                 <?php endif; ?>
@@ -178,43 +176,44 @@ switch ($action) {
         </div>
     </div>
 
-    <!-- Modal para Añadir Clientes -->
-    <div class="modal fade" id="addclient$clientModal" tabindex="-1" aria-labelledby="addclient$clientModalLabel" aria-hidden="true">
+    <!-- Modal para Añadir Producto -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addclient$clientModalLabel">Añadir Nuevo Cliente</h5>
+                    <h5 class="modal-title" id="addProductModalLabel">Añadir Nuevo Producto</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="clients-admin.php?action=add" method="POST">
+                <form action="supplier-admin.php?action=add" method="POST">
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Cédula</label>
-                            <input type="text" class="form-control" name="cedula" placeholder="Ej: V30803977" required>
+                            <label class="form-label">Nombre del Proveedor</label>
+                            <input type="text" class="form-control" name="nombre_contacto" placeholder="Ingrese nombre" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Nombre</label>
-                            <input type="text" class="form-control" name="nombre" placeholder="Ingrese su nombre completo" required>
+                            <label class="form-label">Empresa</label>
+                            <input type="text" class="form-control" name="nombre_empresa" placeholder="Ingrese nombre" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Dirección</label>
-                            <input type="text" class="form-control" name="direccion" placeholder="Ej: Av. Leones, Edif. Los Leones, Piso 3, Barquisimeto" required>
+                            <label class="form-label">Rif</label>
+                            <input type="text" class="form-control" name="id" placeholder="Ingrese rif" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Teléfono</label>
-                            <input type="text" class="form-control" name="telefono" placeholder="Ej: 04245555555" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Membresía</label>
-                            <select class="form-select" name="membresia" required>
-                                <option value="regular">Regular</option>
-                                <option value="vip">VIP</option>
+                            <label class="form-label">Tipo del rif</label>
+                            <select class="form-select" name="tipo_rif" required>
+                                <option value="J">J</option>
+                                <option value="G">G</option>
+                                <option value="C">C</option>
                             </select>
                         </div>
-                        <!--<div class="mb-3">
-                            <label class="form-label">Precio</label>
-                            <input type="number" step="0.01" class="form-control" name="precio" required>
-                        </div>-->
+
+                        <div class="mb-3">
+                            <label class="form-label">Direccion</label>
+                            <input type="text" class="form-control" name="direccion" placeholder="Ingrese direccion" required>
+                        </div>
+
+
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -224,7 +223,10 @@ switch ($action) {
             </div>
         </div>
     </div>
-    
+
+
+
+
     
 
     <!-- Scripts -->

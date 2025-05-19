@@ -22,13 +22,12 @@ class ProductsController {
         }
     }
 
-    public function getProducts() {
+    public function getProductss() {
         return $this->productModel->getAll();
     }
 
     private function handleAddProduct() {
-        $required = [
-            'nombre', 'categoria', 'precio'];
+        $required = [ 'id', 'nombre','tipo' , 'categoria', 'precio'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
                 throw new Exception("El campo $field es requerido");
@@ -36,7 +35,7 @@ class ProductsController {
         }
 
      $success = $this->productModel->add(
-        htmlspecialchars(trim($_POST['id'])),
+        (int)$_POST['id'],
         htmlspecialchars(trim($_POST['nombre'])),
         htmlspecialchars(trim($_POST['tipo'])),
         htmlspecialchars(trim($_POST['categoria'])),
@@ -44,7 +43,7 @@ class ProductsController {
         );
 
         if ($success) {
-            header("Location: index.php?success=add");
+            header("Location: products-admin.php?success=add");
             exit();
         }
     }
@@ -57,7 +56,7 @@ class ProductsController {
         $success = $this->productModel->delete((int)$_GET['id']);
 
         if ($success) {
-            header("Location: index.php?success=add");
+            header("Location: products-admin.php?success=add");
             exit();
         }
     }
@@ -67,4 +66,4 @@ class ProductsController {
 // Instanciar y ejecutar
 $controller = new ProductsController();
 $controller->handleRequest();
-$products = $controller->getProducts();
+$productss = $controller->getProductss();
