@@ -34,18 +34,25 @@ class ProductsController {
             }
         }
 
-     $success = $this->productModel->add(
-        (int)$_POST['id'],
-        htmlspecialchars(trim($_POST['nombre'])),
-        htmlspecialchars(trim($_POST['tipo'])),
-        htmlspecialchars(trim($_POST['categoria'])),
-        (float)$_POST['precio']
-        );
+    $id = (int) $_POST['id'];
+    $nombre = htmlspecialchars(trim($_POST['nombre']));
+    $tipo = htmlspecialchars(trim($_POST['tipo']));
+    $categoria = htmlspecialchars(trim($_POST['categoria']));
+    $precio = (float)$_POST['precio'];
 
-        if ($success) {
-            header("Location: products-admin.php?success=add");
-            exit();
-        }
+    // ✅ Verifica si ya existe antes de insertar
+    if ($this->productModel->productExists($id)) {
+        header("Location: products-admin.php?error=id_duplicado&id=" . urlencode($id));
+        exit();
+    }
+
+    // ✅ Si no existe, lo insertas
+    $success = $this->productModel->add($id, $nombre, $tipo, $categoria, $precio);
+
+    if ($success) {
+        header("Location: products-admin.php?success=add");
+        exit();
+    }
     }
 
     private function handleDeleteProduct() {

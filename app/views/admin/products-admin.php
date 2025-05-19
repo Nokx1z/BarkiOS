@@ -99,6 +99,17 @@ switch ($action) {
                     }
                     ?>
                 </div>
+
+            <?php endif; ?>
+                        <?php if (isset($_GET['error'])): ?>
+                <div class="alert alert-danger mt-3">
+                    <?php 
+                    if ($_GET['error'] === 'id_duplicado') {
+                        $id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : '[ID no proporcionado]';
+                        echo "Error: El ID <strong>$id</strong> ya está registrado.";
+                    }
+                    ?>
+                </div>
             <?php endif; ?>
 
             <!-- Tabla de Productos -->

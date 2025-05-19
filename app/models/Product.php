@@ -14,14 +14,22 @@ class Product {
         $stmt = $this->db->query("SELECT * FROM productos");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
+        public function productExists($id) {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM productos WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetchColumn() > 0;
+    }
     // Agregar nuevo producto
-    public function add($id, $nombre, $tipo, $categoria, $precio) {
+    public function add( $id, $nombre, $tipo, $categoria, $precio) {
+
+            if ($this->productExists($id)) {
+            throw new Exception("Ya existe un cliente con esta cédula");
+        }
+
         $stmt = $this->db->prepare("
             INSERT INTO productos (id, nombre, tipo, categoria, precio)
             VALUES (:id, :nombre, :tipo, :categoria, :precio)
         ");
-
         return $stmt->execute([
             ':id' => $id,
             ':nombre' => $nombre,
