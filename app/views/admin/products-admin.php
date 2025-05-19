@@ -81,19 +81,12 @@ $controller->handleRequest(); // maneja add/delete/truncate
     <div class="main-content">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="display-6 fw-bold text-dark">GARAGE<span class="text-dark">BARKI</span></h1>
+                <h1 class="display-6 fw-bold text-dark">Gestión de productos</h1>
             </div>
             <button class="btn btn-primary rounded-pill px-4 me-3" data-bs-toggle="modal" data-bs-target="#addProductModal">
                 <i class="fas fa-plus me-1"></i> Añadir Producto
             </button>
             
-        <form action="index.php?action=truncate" method="POST" 
-            onsubmit="return confirm('¿Estás seguro de que deseas eliminar TODOS los productos y reiniciar el ID?');" 
-            style="display:inline-block;">
-            <button type="submit" class="btn btn-danger rounded-pill px-4">
-            <i class="fas fa-trash-alt me-1"></i> Reiniciar Tabla
-            </button>
-        </form>
             <!-- Mensajes de éxito/error -->
             <?php if (isset($_GET['success'])): ?>
                 <div class="alert alert-success mt-3">
@@ -110,10 +103,12 @@ $controller->handleRequest(); // maneja add/delete/truncate
             <div class="card mt-3">
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle table-hover text-center">
                             <thead>
                                 <tr>
+                                    <th>Código</th>
                                     <th>Nombre</th>
+                                    <th>Tipo</th>
                                     <th>Categoría</th>
                                     <th>Precio</th>
                                     <th>Acciones</th>
@@ -123,11 +118,13 @@ $controller->handleRequest(); // maneja add/delete/truncate
                                 <?php if (!empty($products)): ?>
                                     <?php foreach ($products as $product): ?>
                                         <tr>
+                                            <td><?= htmlspecialchars($product['id'] ?? '') ?></td>
                                             <td><?= htmlspecialchars($product['nombre'] ?? '') ?></td>
+                                            <td><?= htmlspecialchars($product['tipo'] ?? '') ?></td>
                                             <td><?= htmlspecialchars($product['categoria'] ?? '') ?></td>
                                             <td>$<?= number_format($product['precio'] ?? 0, 2) ?></td>
                                             <td>
-                                                <a href="index.php?action=delete&id=<?= $product['codigo'] ?>" 
+                                                <a href="index.php?action=delete&id=<?= $product['id'] ?>" 
                                                    class="btn btn-sm btn-outline-danger"
                                                    onclick="return confirm('¿Estás seguro de eliminar este producto?')">
                                                     <i class="fas fa-trash"></i> Eliminar
@@ -145,9 +142,13 @@ $controller->handleRequest(); // maneja add/delete/truncate
                             </tbody>
                         </table>
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
 
     <!-- Modal para Añadir Producto -->

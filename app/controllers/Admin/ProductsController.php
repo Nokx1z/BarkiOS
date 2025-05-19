@@ -16,8 +16,6 @@ class ProductsController {
                 $this->handleAddProduct();
             } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'delete') {
                 $this->handleDeleteProduct();
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'truncate') {
-                $this->handleTruncate(); // Asegúrate de que esta línea exista
             }
         } catch (Exception $e) {
             die("Error: " . $e->getMessage());
@@ -63,12 +61,7 @@ class ProductsController {
             exit();
         }
     }
-    
-    private function handleTruncate() {
-        $this->productModel->truncate();
-        header("Location: index.php?success=add");
-        exit();
-    }
+
 }
 
 // Instanciar y ejecutar

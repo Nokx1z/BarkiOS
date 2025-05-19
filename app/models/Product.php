@@ -21,7 +21,7 @@ class Product {
             INSERT INTO productos (id, nombre, tipo, categoria, precio)
             VALUES (:id, :nombre, :tipo, :categoria, :precio)
         ");
-        
+
         return $stmt->execute([
             ':id' => $id,
             ':nombre' => $nombre,
@@ -30,10 +30,6 @@ class Product {
             ':precio' => $precio
         ]);
     }
-public function truncate() {
-    $stmt = $this->db->prepare("TRUNCATE TABLE productos");
-    return $stmt->execute();
-}
 
     // Eliminar producto por ID
     public function delete($id) {
