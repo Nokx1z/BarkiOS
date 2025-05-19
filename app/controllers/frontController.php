@@ -1,9 +1,8 @@
 <?php
 class FrontController {
-    private $url;
     private $controller;
     private $action;
-    private $params;
+    private $params = [];
 
     public function __construct() {
         $this->parseUrl();
@@ -11,49 +10,50 @@ class FrontController {
     }
 
     private function parseUrl() {
-        $request = $_SERVER['REQUEST_URI'] ?? '/';
-        $parsedUrl = parse_url($request);
-        $path = trim($parsedUrl['path'] ?? '', '/');
-        $query = $parsedUrl['query'] ?? '';
-        
-        // Extraer partes de la URL (formato: /controller/action/param1/param2)
-        $parts = explode('/', $path);
-        $this->controller = $this->sanitize($parts[0] ?? 'home');
-        $this->action = $this->sanitize($parts[1] ?? 'index');
-        $this->params = array_slice($parts, 2);
-        
-        // Parsear query string adicional
-        parse_str($query, $queryParams);
-        $this->params = array_merge($this->params, $queryParams);
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+        $scriptName = $_SERVER['SCRIPT_NAME']; // Ej: /app/index.php
+
+        $basePath = str_replace('/index.php', '', $scriptName); // /app
+        $relativeUri = str_replace($basePath, '', $requestUri); // /admin/products...
+
+        $uriParts = explode('?', $relativeUri);
+        $path = trim($uriParts[0], '/');
+        $segments = explode('/', $path);
+
+        // /admin/products/index
+        $this->controller = $this->sanitize($segments[1] ?? 'products');
+        $this->action = $this->sanitize($segments[2] ?? 'index');
+        $this->params = array_slice($segments, 3);
     }
 
     private function sanitize($input) {
-        return preg_replace('/[^a-zA-Z0-9_-]/', '', $input);
+        return preg_replace('/[^a-zA-Z0-9_]/', '', $input);
     }
 
     private function loadController() {
-        $controllerFile = __DIR__.'/../../app/controllers/Admin/'.ucfirst($this->controller).'Controller.php';
-        
+        $controllerName = ucfirst($this->controller) . 'Controller';
+        $controllerFile = __DIR__ . '/Admin/' . $controllerName . '.php';
+
         if (!file_exists($controllerFile)) {
-            die('Error 404: Controlador no encontrado');
+            die("Error 404: Controlador no encontrado ($controllerFile)");
         }
 
         require_once $controllerFile;
-        
-        $controllerClass = 'App\\Controllers\\Admin\\'.ucfirst($this->controller).'Controller';
-        if (!class_exists($controllerClass)) {
-            die('Error 500: Clase del controlador no existe');
+
+        if (!class_exists($controllerName)) {
+            die("Error 500: Clase del controlador no existe ($controllerName)");
         }
 
-        $controller = new $controllerClass();
-        
+        $controller = new $controllerName();
+
         if (!method_exists($controller, $this->action)) {
-            die('Error 404: Acción no encontrada');
+            die("Error 404: Acción '{$this->action}' no encontrada.");
         }
 
         call_user_func_array([$controller, $this->action], $this->params);
     }
 }
+
 
 // Uso
 new FrontController();
