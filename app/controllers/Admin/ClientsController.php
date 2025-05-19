@@ -5,7 +5,7 @@ class ClientsController {
     private $clientsModel;
 
     public function __construct() {
-        $this->clientsModel = new clients();
+        $this->clientsModel = new Clients();
     }
 
     public function handleRequest() {
@@ -45,7 +45,7 @@ class ClientsController {
         );
 
         if ($success) {
-            header("Location: index.php?success=add");
+            header("Location: clients-admin.php?success=add");
             exit();
         }
     }
@@ -58,14 +58,14 @@ class ClientsController {
         $success = $this->clientsModel->delete((int)$_GET['id']);
 
         if ($success) {
-            header("Location: index.php?success=add");
+            header("Location: clients-admin.php?success=add");
             exit();
         }
     }
     
     private function handleTruncate() {
         $this->clientsModel->truncate();
-        header("Location: index.php?success=add");
+        header("Location: clients-admin.php?success=add");
         exit();
     }
 }

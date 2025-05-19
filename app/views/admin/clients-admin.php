@@ -1,8 +1,32 @@
 <?php
-// Incluimos el controlador y obtenemos los client$clientos
+// Incluimos el controlador y obtenemos los productos
 require_once __DIR__.'/../../controllers/Admin/ClientsController.php';
+
 $controller = new ClientsController();
-$controller->handleRequest(); // maneja add/delete/truncate
+
+$action = $_GET['action'] ?? null;
+
+switch ($action) {
+    case 'delete':
+        if (isset($_GET['id'])) {
+            $controller->deleteClient($_GET['id']);
+            header('Location: clients-admin.php?success=delete');
+            exit;
+        }
+        break;
+
+    case 'add':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->addClient($_POST['cedula'], $_POST['nombre'], $_POST['dirección'], $_POST['telefono'], $_POST['membresia']);
+            header('Location: clients-admin.php?success=add');
+            exit;
+        }
+        break;
+
+    default:
+        $clientes = $controller->getclientss();
+        break;
+}
 ?>
 
 <!DOCTYPE html>
@@ -88,7 +112,7 @@ $controller->handleRequest(); // maneja add/delete/truncate
                 <i class="fas fa-plus me-1"></i> Añadir Cliente
             </button>
             
-        <form action="index.php?action=truncate" method="POST" 
+        <form action="clients-admin.php?action=truncate" method="POST" 
             onsubmit="return confirm('¿Estás seguro de que deseas eliminar TODOS los clientes y reiniciar el ID?');" 
             style="display:inline-block;">
             <button type="submit" class="btn btn-danger rounded-pill px-4">
@@ -122,8 +146,8 @@ $controller->handleRequest(); // maneja add/delete/truncate
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if (!empty($clients)): ?>
-                                    <?php foreach ($clients as $client): ?>
+                                <?php if (!empty($clientss)): ?>
+                                    <?php foreach ($clientss as $client): ?>
                                         <tr>
                                             <td><?= htmlspecialchars($client['cedula'] ?? '') ?></td>
                                             <td><?= htmlspecialchars($client['nombre'] ?? '') ?></td>
@@ -162,7 +186,7 @@ $controller->handleRequest(); // maneja add/delete/truncate
                     <h5 class="modal-title" id="addclient$clientModalLabel">Añadir Nuevo Cliente</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="index.php?action=add" method="POST">
+                <form action="clients-admin.php?action=add" method="POST">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Cédula</label>
