@@ -112,13 +112,7 @@ switch ($action) {
                 <i class="fas fa-plus me-1"></i> Añadir Cliente
             </button>
             
-        <form action="clients-admin.php?action=truncate" method="POST" 
-            onsubmit="return confirm('¿Estás seguro de que deseas eliminar TODOS los clientes y reiniciar el ID?');" 
-            style="display:inline-block;">
-            <button type="submit" class="btn btn-danger rounded-pill px-4">
-            <i class="fas fa-trash-alt me-1"></i> Reiniciar Tabla
-            </button>
-        </form>
+
             <!-- Mensajes de éxito/error -->
             <?php if (isset($_GET['success'])): ?>
                 <div class="alert alert-success mt-3">
@@ -131,47 +125,59 @@ switch ($action) {
                 </div>
             <?php endif; ?>
 
+            <?php if (isset($_GET['error'])): ?>
+                <div class="alert alert-danger mt-3">
+                    <?php 
+                    if ($_GET['error'] === 'cedula_duplicada') {
+            $cedula = isset($_GET['cedula']) ? htmlspecialchars($_GET['cedula']) : '';
+            echo "Error: La cédula $cedula ya está registrada.";
+                    }
+                    ?>
+    </div>
+<?php endif; ?>
+
             <!-- Tabla de Clientes -->
             <div class="card mt-3">
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Cédula</th>
-                                    <th>Nombre</th>
-                                    <th>Dirección</th>
-                                    <th>Número de Teléfono</th>
-                                    <th>Membresía</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($clientss)): ?>
-                                    <?php foreach ($clientss as $client): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($client['cedula'] ?? '') ?></td>
-                                            <td><?= htmlspecialchars($client['nombre'] ?? '') ?></td>
-                                            <td>$<?= htmlspecialchars($client['direccion'] ?? '') ?></td>
-                                            <td>$<?= number_format($client['telefono'] ?? '') ?></td>
-                                            <td>$<?= htmlspecialchars($client['membresia'] ?? '') ?></td>
-                                            <td>
-                                                <a href="index.php?action=delete&id=<?= $client['cedula'] ?>" 
-                                                   class="btn btn-sm btn-outline-danger"
-                                                   onclick="return confirm('¿Estás seguro de eliminar a este cliente?')">
-                                                    <i class="fas fa-trash"></i> Eliminar
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="6" class="text-center">
-                                            <div class="alert alert-info mb-0">No hay clientes disponibles</div>
-                                        </td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+<table class="table table-hover align-middle">
+    <thead>
+        <tr>
+            <th class="text-center">Cédula</th>
+            <th>Nombre</th>
+            <th>Dirección</th>
+            <th class="text-end">Teléfono</th>
+            <th class="text-center">Membresía</th>
+            <th class="text-center">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (!empty($clientss)): ?>
+            <?php foreach ($clientss as $client): ?>
+                <tr>
+                    <td class="text-center"><?= htmlspecialchars($client['cedula'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($client['nombre'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($client['direccion'] ?? '') ?></td>
+                    <td class="text-end"><?= preg_replace('/(\d{4})(\d{7})/', '$1-$2', $client['telefono'] ?? '') ?></td>
+                    <td class="text-center"><?= htmlspecialchars($client['membresia'] ?? '') ?></td>
+                    <td class="text-center">
+                        <a href="clients-admin.php?action=delete&cedula=<?= $client['cedula'] ?>" 
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('¿Estás seguro de eliminar a este cliente?')">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="6" class="text-center">
+                    <div class="alert alert-info mb-0">No hay clientes disponibles</div>
+                </td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
                     </div>
                 </div>
             </div>
