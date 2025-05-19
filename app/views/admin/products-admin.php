@@ -172,7 +172,12 @@ switch ($action) {
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Nombre</label>
-                        <input type="text" class="form-control" name="nombre" placeholder="Ingrese nombre del producto" required>
+                        <input type="text" class="form-control" 
+                            name="nombre" 
+                            placeholder="Ingrese nombre del producto" 
+                            pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+                            oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');"
+                            required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Categoría</label>
