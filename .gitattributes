@@ -1,6 +1,0 @@
-# Excluir dependencias
-vendor/** linguist-vendored=true
-docker/** linguist-vendored=true
-
-# Priorizar solo tu código
-app/** linguist-detectable=true
