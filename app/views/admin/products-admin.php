@@ -1,4 +1,3 @@
-
 <?php
 // Incluimos el controlador y obtenemos los productos
 require_once __DIR__.'/../../controllers/Admin/ProductsController.php';
@@ -18,14 +17,14 @@ switch ($action) {
 
     case 'add':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $controller->addProduct($_POST['nombre'], $_POST['categoria'], $_POST['precio']);
+            $controller->addProduct($_POST['id'], $_POST['nombre'], $_POST['tipo'], $_POST['categoria'], $_POST['precio']);
             header('Location: products-admin.php?success=add');
             exit;
         }
         break;
 
     default:
-        $products = $controller->getProducts();
+        $products = $controller->getProductss();
         break;
 }
 ?>
@@ -48,7 +47,6 @@ switch ($action) {
     <link rel="stylesheet" href="../../../public/assets/css/admin-styles.css">
 </head>
 <body>
-
 
 <nav class="sidebar" id="sidebar">
     <div class="sidebar-sticky">
@@ -85,71 +83,78 @@ switch ($action) {
 <div class="main-content">
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="display-6 fw-bold text-dark">GARAGE<span class="text-dark">BARKI</span></h1>
+            <h1 class="display-6 fw-bold text-dark">Proveedores</h1>
         </div>
-        <button class="btn btn-primary rounded-pill px-4 me-3" data-bs-toggle="modal" data-bs-target="#addProductModal">
-            <i class="fas fa-plus me-1"></i> Añadir Producto
+    <button class="btn btn-primary rounded-pill px-4 me-3" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            <i class="fas fa-plus me-1"></i> Agregar contacto
         </button>
-        <form action="/admin/products/truncate" method="POST"
-              onsubmit="return confirm('¿Estás seguro de que deseas eliminar TODOS los productos y reiniciar el ID?');"
-              style="display:inline-block;">
-            <button type="submit" class="btn btn-danger rounded-pill px-4">
-                <i class="fas fa-trash-alt me-1"></i> Reiniciar Tabla
-            </button>
-        </form>
-
+            
+            <!-- Mensajes de éxito/error -->
         <?php if (isset($_GET['success'])): ?>
             <div class="alert alert-success mt-3">
-                <?php
-                switch ($_GET['success']) {
-                    case 'add':
-                        echo 'Producto agregado correctamente';
-                        break;
-                    case 'delete':
-                        echo 'Producto eliminado correctamente';
-                        break;
-                }
-                ?>
-            </div>
-        <?php endif; ?>
+                <?php 
+            switch($_GET['success']) {
+            case 'add': echo 'Producto agregado correctamente'; break;
+            case 'delete': echo 'Producto eliminado correctamente'; break;
+                    }
+                    ?>
+                </div>
 
-        <div class="card mt-3">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Categoría</th>
-                            <th>Precio</th>
-                            <th>Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php if (!empty($products)): ?>
-                            <?php foreach ($products as $product): ?>
+            <?php endif; ?>
+                        <?php if (isset($_GET['error'])): ?>
+                <div class="alert alert-danger mt-3">
+                    <?php 
+                    if ($_GET['error'] === 'id_duplicado') {
+                        $id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : '[ID no proporcionado]';
+                        echo "Error: El ID <strong>$id</strong> ya está registrado.";
+                    }
+                    ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Tabla de Productos -->
+            <div class="card mt-3">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle table-hover text-center">
+                            <thead>
                                 <tr>
-                                    <td><?= htmlspecialchars($product['nombre'] ?? '') ?></td>
-                                    <td><?= htmlspecialchars($product['categoria'] ?? '') ?></td>
-                                    <td>$<?= number_format($product['precio'] ?? 0, 2) ?></td>
-                                    <td>
-                                        <a href="products-admin.php?action=delete&id=<?= $product['codigo'] ?>"
-                                           class="btn btn-sm btn-outline-danger"
-                                           onclick="return confirm('¿Estás seguro de eliminar este producto?')">
-                                            <i class="fas fa-trash"></i> Eliminar
-                                        </a>
-                                    </td>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Tipo</th>
+                                    <th>Categoría</th>
+                                    <th>Precio</th>
+                                    <th>Acciones</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center">
-                                    <div class="alert alert-info mb-0">No hay productos disponibles</div>
-                                </td>
-                            </tr>
-                        <?php endif; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($products)): ?>
+                                    <?php foreach ($products as $product): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($product['id'] ?? '') ?></td>
+                                            <td><?= htmlspecialchars($product['nombre'] ?? '') ?></td>
+                                            <td><?= htmlspecialchars($product['tipo'] ?? '') ?></td>
+                                            <td><?= htmlspecialchars($product['categoria'] ?? '') ?></td>
+                                            <td>$<?= number_format($product['precio'] ?? 0, 2) ?></td>
+                                            <td>
+                                                <a href="products-admin.php?action=delete&id=<?= $product['id'] ?>" 
+                                                   class="btn btn-sm btn-outline-danger"
+                                                   onclick="return confirm('¿Estás seguro de eliminar este producto?')">
+                                                    <i class="fas fa-trash"></i> Eliminar
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="4" class="text-center">
+                                            <div class="alert alert-info mb-0">No hay productos disponibles</div>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -167,12 +172,7 @@ switch ($action) {
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Nombre</label>
-                        <input type="text" class="form-control" 
-                            name="nombre" 
-                            placeholder="Ingrese nombre del producto" 
-                            pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
-                            oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');"
-                            required>
+                        <input type="text" class="form-control" name="nombre" placeholder="Ingrese nombre del producto" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Categoría</label>

@@ -16,36 +16,43 @@ class ProductsController {
                 $this->handleAddProduct();
             } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'delete') {
                 $this->handleDeleteProduct();
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'truncate') {
-                $this->handleTruncate(); // Asegúrate de que esta línea exista
             }
         } catch (Exception $e) {
             die("Error: " . $e->getMessage());
         }
     }
 
-    public function getProducts() {
+    public function getProductss() {
         return $this->productModel->getAll();
     }
 
     private function handleAddProduct() {
-        $required = ['nombre', 'categoria', 'precio'];
+        $required = [ 'id', 'nombre','tipo' , 'categoria', 'precio'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
                 throw new Exception("El campo $field es requerido");
             }
         }
 
-        $success = $this->productModel->add(
-            htmlspecialchars(trim($_POST['nombre'])),
-            htmlspecialchars(trim($_POST['categoria'])),
-            (float)$_POST['precio']
-        );
+    $id = (int) $_POST['id'];
+    $nombre = htmlspecialchars(trim($_POST['nombre']));
+    $tipo = htmlspecialchars(trim($_POST['tipo']));
+    $categoria = htmlspecialchars(trim($_POST['categoria']));
+    $precio = (float)$_POST['precio'];
 
-        if ($success) {
-            header("Location: index.php?success=add");
-            exit();
-        }
+    // ✅ Verifica si ya existe antes de insertar
+    if ($this->productModel->productExists($id)) {
+        header("Location: products-admin.php?error=id_duplicado&id=" . urlencode($id));
+        exit();
+    }
+
+    // ✅ Si no existe, lo insertas
+    $success = $this->productModel->add($id, $nombre, $tipo, $categoria, $precio);
+
+    if ($success) {
+        header("Location: products-admin.php?success=add");
+        exit();
+    }
     }
 
     private function handleDeleteProduct() {
@@ -56,19 +63,14 @@ class ProductsController {
         $success = $this->productModel->delete((int)$_GET['id']);
 
         if ($success) {
-            header("Location: index.php?success=add");
+            header("Location: products-admin.php?success=add");
             exit();
         }
     }
-    
-    private function handleTruncate() {
-        $this->productModel->truncate();
-        header("Location: index.php?success=add");
-        exit();
-    }
+
 }
 
 // Instanciar y ejecutar
 $controller = new ProductsController();
 $controller->handleRequest();
-$products = $controller->getProducts();
+$productss = $controller->getProductss();

@@ -14,25 +14,30 @@ class Product {
         $stmt = $this->db->query("SELECT * FROM productos");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
+        public function productExists($id) {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM productos WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetchColumn() > 0;
+    }
     // Agregar nuevo producto
-    public function add($nombre, $categoria, $precio) {
-        $codigo = uniqid('BARKI-');
+    public function add( $id, $nombre, $tipo, $categoria, $precio) {
+
+            if ($this->productExists($id)) {
+            throw new Exception("Ya existe un cliente con esta cédula");
+        }
+
         $stmt = $this->db->prepare("
-            INSERT INTO productos (codigo, nombre, categoria, precio)
-            VALUES (:codigo, :nombre, :categoria, :precio)
+            INSERT INTO productos (id, nombre, tipo, categoria, precio)
+            VALUES (:id, :nombre, :tipo, :categoria, :precio)
         ");
         return $stmt->execute([
-            ':codigo' => $codigo,
+            ':id' => $id,
             ':nombre' => $nombre,
+            ':tipo' => $tipo,
             ':categoria' => $categoria,
             ':precio' => $precio
         ]);
     }
-public function truncate() {
-    $stmt = $this->db->prepare("TRUNCATE TABLE productos");
-    return $stmt->execute();
-}
 
     // Eliminar producto por ID
     public function delete($id) {
