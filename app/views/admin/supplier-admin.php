@@ -49,7 +49,7 @@ switch ($action) {
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Favicon -->
-    <link rel="shortcut icon" href="/assets/icons/Logo - Garage Barki.webp" type="image/x-icon">
+    <link rel="shortcut icon" href="../../../public/assets/icons/Logo - Garage Barki.webp" type="image/x-icon">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../../../public/assets/css/admin-styles.css">
 </head>
@@ -63,7 +63,7 @@ switch ($action) {
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="#Profe_No_Hago_Nada">
                         <i class="fas fa-tachometer-alt"></i>
                         Inicio
                     </a>

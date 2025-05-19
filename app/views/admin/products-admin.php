@@ -42,51 +42,54 @@ switch ($action) {
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Favicon -->
-    <link rel="shortcut icon" href="/assets/icons/Logo - Garage Barki.webp" type="image/x-icon">
+    <link rel="shortcut icon" href="../../../public/assets/icons/Logo - Garage Barki.webp" type="image/x-icon">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../../../public/assets/css/admin-styles.css">
 </head>
 <body>
 
-<nav class="sidebar" id="sidebar">
-    <div class="sidebar-sticky">
-        <div class="sidebar-header">
-            <h3>GARAGE<span>BARKI</span></h3>
-            <p class="mb-0">Panel de Administración</p>
+        <nav class="sidebar" id="sidebar">
+        <div class="sidebar-sticky">
+            <div class="sidebar-header">
+                <h3>GARAGE<span>BARKI</span></h3>
+                <p class="mb-0">Panel de Administración</p>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="#Profe_No_Hago_Nada">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Inicio
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/app/views/admin/products-admin.php">
+                        <i class="fas fa-tshirt"></i>
+                        Productos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/app/views/admin/supplier-admin.php">
+                        <i class="fas fa-shopping-cart"></i>
+                        Proveedores
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/app/views/admin/clients-admin.php">
+                        <i class="fas fa-users"></i>
+                        Clientes
+                    </a>
+                </li>
+            </ul>
         </div>
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" href="productos.html"><i class="fas fa-tshirt"></i> Productos</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/app/views/admin/supplier-admin.php"><i class="fas fa-shopping-cart"></i> Órdenes</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/app/views/admin/clients-admin.php"><i class="fas fa-users"></i> Clientes</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#"><i class="fas fa-chart-bar"></i> Reportes</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#"><i class="fas fa-cog"></i> Configuración</a>
-            </li>
-        </ul>
-        <div class="sidebar-footer">
-            <a class="nav-link" href="login.html"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
-        </div>
-    </div>
-</nav>
+    </nav>
 
 <div class="main-content">
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="display-6 fw-bold text-dark">Proveedores</h1>
+            <h1 class="display-6 fw-bold text-dark">Productos</h1>
         </div>
     <button class="btn btn-primary rounded-pill px-4 me-3" data-bs-toggle="modal" data-bs-target="#addProductModal">
-            <i class="fas fa-plus me-1"></i> Agregar contacto
+            <i class="fas fa-plus me-1"></i> Agregar producto
         </button>
             
             <!-- Mensajes de éxito/error -->
@@ -147,7 +150,7 @@ switch ($action) {
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="4" class="text-center">
+                                        <td colspan="6" class="text-center">
                                             <div class="alert alert-info mb-0">No hay productos disponibles</div>
                                         </td>
                                     </tr>
@@ -182,13 +185,13 @@ switch ($action) {
                         <div class="mb-3">
                             <label class="form-label">Categoría</label>
                             <select class="form-select" name="categoria" required>
-                                <option value="vestidos">Vestidos</option>
-                                <option value="blusas">Blusas</option>
-                                <option value="pantalones">Pantalones</option>
+                                <option value="Formal">Formal</option>
+                                <option value="Casual">Casual</option>
+                                <option value="Ujum">Ujum</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Categoría</label>
+                            <label class="form-label">Tipo de prenda</label>
                             <select class="form-select" name="tipo" required>
                                 <option value="vestidos">Vestidos</option>
                                 <option value="blusas">Blusas</option>
