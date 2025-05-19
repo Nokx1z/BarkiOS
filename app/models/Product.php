@@ -16,23 +16,20 @@ class Product {
     }
 
     // Agregar nuevo producto
-    public function add($nombre, $categoria, $precio) {
-        $codigo = uniqid('BARKI-');
+    public function add($id, $nombre, $tipo, $categoria, $precio) {
         $stmt = $this->db->prepare("
-            INSERT INTO productos (codigo, nombre, categoria, precio)
-            VALUES (:codigo, :nombre, :categoria, :precio)
+            INSERT INTO productos (id, nombre, tipo, categoria, precio)
+            VALUES (:id, :nombre, :tipo, :categoria, :precio)
         ");
+
         return $stmt->execute([
-            ':codigo' => $codigo,
+            ':id' => $id,
             ':nombre' => $nombre,
+            ':tipo' => $tipo,
             ':categoria' => $categoria,
             ':precio' => $precio
         ]);
     }
-public function truncate() {
-    $stmt = $this->db->prepare("TRUNCATE TABLE productos");
-    return $stmt->execute();
-}
 
     // Eliminar producto por ID
     public function delete($id) {
