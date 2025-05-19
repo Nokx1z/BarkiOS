@@ -16,8 +16,6 @@ class SupplierController {
                 $this->handleAddSupplier();
             } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'delete') {
                 $this->handleDeleteSupplier();
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'truncate') {
-                $this->handleTruncate(); 
             }
         } catch (Exception $e) {
             die("Error: " . $e->getMessage());
@@ -61,12 +59,6 @@ class SupplierController {
         header('Location: supplier-admin.php?success=delete');
             exit();
         }
-    }
-    
-    private function handleTruncate() {
-        $this->supplierModel->truncate();
-        header('Location: supplier-admin.php?success=add');
-        exit();
     }
 }
 

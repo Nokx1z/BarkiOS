@@ -118,13 +118,6 @@ switch ($action) {
                 <i class="fas fa-plus me-1"></i> Agregar contacto
             </button>
             
-        <form action="index.php?action=truncate" method="POST" 
-            onsubmit="return confirm('¿Estás seguro de que deseas eliminar TODOS los productos y reiniciar el ID?');" 
-            style="display:inline-block;">
-            <button type="submit" class="btn btn-danger rounded-pill px-4">
-            <i class="fas fa-trash-alt me-1"></i> Reiniciar Tabla
-            </button>
-        </form>
             <!-- Mensajes de éxito/error -->
             <?php if (isset($_GET['success'])): ?>
                 <div class="alert alert-success mt-3">
@@ -141,10 +134,9 @@ switch ($action) {
             <div class="card mt-3">
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle text-center" >
                             <thead>
                                 <tr>
-                                    <th>Tipo rif</th>
                                     <th>Rif</th>
                                     <th>Contacto</th>
                                     <th>Empresa</th>
@@ -156,8 +148,7 @@ switch ($action) {
                                 <?php if (!empty($supplier)): ?>
                                     <?php foreach ($supplier as $supplier): ?>
                                         <tr>
-                                            <td><?= htmlspecialchars($supplier['tipo_rif'] ?? '') ?></td>
-                                            <td><?= htmlspecialchars($supplier['id'] ?? '') ?></td>
+                                            <td><?= htmlspecialchars($supplier['tipo_rif'] ?? '') ?>-<?= htmlspecialchars($supplier['id'] ?? '') ?></td>
                                             <td><?= htmlspecialchars($supplier['nombre_contacto'] ?? '') ?></td>
                                             <td><?= htmlspecialchars($supplier['nombre_empresa'] ?? '') ?></td>
                                             <td><?= htmlspecialchars($supplier['direccion'] ?? '') ?></td>
@@ -172,7 +163,7 @@ switch ($action) {
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="6" class="text-center">
+                                        <td colspan="5" class="text-center">
                                             <div class="alert alert-info mb-0">No hay productos disponibles</div>
                                         </td>
                                     </tr>
