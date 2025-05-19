@@ -49,6 +49,7 @@ switch ($action) {
 </head>
 <body>
 
+
 <nav class="sidebar" id="sidebar">
     <div class="sidebar-sticky">
         <div class="sidebar-header">
@@ -63,7 +64,7 @@ switch ($action) {
                 <a class="nav-link active" href="productos.html"><i class="fas fa-tshirt"></i> Productos</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="ordenes.html"><i class="fas fa-shopping-cart"></i> Órdenes</a>
+                <a class="nav-link" href="/app/views/admin/supplier-admin.php"><i class="fas fa-shopping-cart"></i> Órdenes</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/app/views/admin/clients-admin.php"><i class="fas fa-users"></i> Clientes</a>
