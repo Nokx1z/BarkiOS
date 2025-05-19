@@ -65,7 +65,7 @@ switch ($action) {
                 <li class="nav-item">
                     <a class="nav-link" href="client$clientos.html">
                         <i class="fas fa-tshirt"></i>
-                        client$clientos
+                        Productos
                     </a>
                 </li>
                 <li class="nav-item">
