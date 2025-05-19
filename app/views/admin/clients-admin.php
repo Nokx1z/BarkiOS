@@ -57,48 +57,30 @@ switch ($action) {
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="dashboard.html">
+                    <a class="nav-link" href="#Profe_No_Hago_Nada">
                         <i class="fas fa-tachometer-alt"></i>
-                        Dashboard
+                        Inicio
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="./products-admin.php">
+                    <a class="nav-link" href="/app/views/admin/products-admin.php">
                         <i class="fas fa-tshirt"></i>
                         Productos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="./supplier-admin.php">
+                    <a class="nav-link" href="ordenes.html">
                         <i class="fas fa-shopping-cart"></i>
                         Proveedores
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">
+                    <a class="nav-link active" href="/app/views/admin/clients-admin.php">
                         <i class="fas fa-users"></i>
                         Clientes
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-chart-bar"></i>
-                        Reportes
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-cog"></i>
-                        Configuración
-                    </a>
-                </li>
             </ul>
-            <div class="sidebar-footer">
-                <a class="nav-link" href="login.html">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Cerrar Sesión
-                </a>
-            </div>
         </div>
     </nav>
 
@@ -106,7 +88,7 @@ switch ($action) {
     <div class="main-content">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="display-6 fw-bold text-dark">GARAGE<span class="text-dark">BARKI</span></h1>
+                <h1 class="display-6 fw-bold text-dark">Clientes</h1>
             </div>
             <button class="btn btn-primary rounded-pill px-4 me-3" data-bs-toggle="modal" data-bs-target="#addclient$clientModal">
                 <i class="fas fa-plus me-1"></i> Añadir Cliente

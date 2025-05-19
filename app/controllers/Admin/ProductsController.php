@@ -63,7 +63,7 @@ class ProductsController {
         $success = $this->productModel->delete((int)$_GET['id']);
 
         if ($success) {
-            header("Location: products-admin.php?success=add");
+            header("Location: products-admin.php?success=delete");
             exit();
         }
     }
