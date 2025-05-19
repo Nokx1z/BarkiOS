@@ -1,45 +1,47 @@
 <?php
-require_once __DIR__.'/../core/Database.php';
+require_once __DIR__ . '/../core/Database.php';
 
-// Obtener conexión a la base de datos
-function getDbConnection() {
-    $database = Database::getInstance();
-    return $database->getConnection();
-}
+class SupplierModel {
 
-// Obtener todos los productos
-function getAllProducts() {
-    $db = getDbConnection();
-    $stmt = $db->query("SELECT * FROM productos");
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+    private function getDbConnection() {
+        $database = Database::getInstance();
+        return $database->getConnection();
+    }
 
-// Agregar nuevo producto
-function addProduct($nombre, $categoria, $precio) {
-    $db = getDbConnection();
-    $codigo = uniqid('BARKI-');
-    $stmt = $db->prepare("
-        INSERT INTO productos (codigo, nombre, categoria, precio)
-        VALUES (:codigo, :nombre, :categoria, :precio)
-    ");
-    return $stmt->execute([
-        ':codigo' => $codigo,
-        ':nombre' => $nombre,
-        ':categoria' => $categoria,
-        ':precio' => $precio
-    ]);
-}
+    // Obtener todos los proveedores
+    public function getAll() {
+        $db = $this->getDbConnection();
+        $stmt = $db->query("SELECT * FROM proveedores");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
-// Vaciar la tabla de productos
-function truncateProducts() {
-    $db = getDbConnection();
-    $stmt = $db->prepare("TRUNCATE TABLE productos");
-    return $stmt->execute();
-}
+    // Agregar nuevo proveedor
+    public function add($tipo_rif, $rif, $direccion, $nombre_empresa, $nombre_contacto) {
+        $db = $this->getDbConnection();
+        $stmt = $db->prepare("
+            INSERT INTO proveedores (tipo_rif, rif, direccion, nombre_empresa, nombre_contacto)
+            VALUES (:tipo_rif, :rif, :direccion, :nombre_empresa, :nombre_contacto)
+        ");
+        return $stmt->execute([
+            ':tipo_rif' => $tipo_rif,
+            ':rif' => $rif,
+            ':direccion' => $direccion,
+            ':nombre_empresa' => $nombre_empresa,
+            ':nombre_contacto' => $nombre_contacto
+        ]);
+    }
 
-// Eliminar producto por ID
-function deleteProduct($id) {
-    $db = getDbConnection();
-    $stmt = $db->prepare("DELETE FROM productos WHERE id = :id");
-    return $stmt->execute([':id' => $id]);
+    // Vaciar la tabla de proveedores
+    public function truncate() {
+        $db = $this->getDbConnection();
+        $stmt = $db->prepare("TRUNCATE TABLE proveedores");
+        return $stmt->execute();
+    }
+
+    // Eliminar proveedor por ID
+    public function delete($id) {
+        $db = $this->getDbConnection();
+        $stmt = $db->prepare("DELETE FROM proveedores WHERE id = :id");
+        return $stmt->execute([':id' => $id]);
+    }
 }

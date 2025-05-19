@@ -44,7 +44,7 @@ $controller->handleRequest(); // maneja add/delete/truncate
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="ordenes.html">
+                    <a class="nav-link active" href="/app/views/admin/supplier-admin.php">
                         <i class="fas fa-shopping-cart"></i>
                         Órdenes
                     </a>

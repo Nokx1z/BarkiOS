@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/controllers/Admin/ProductsController.php';
+require_once __DIR__ . '/controllers/Admin/supplierController.php';
 
 $controller = new ProductsController();
 $controller->handleRequest();
@@ -22,7 +23,11 @@ switch ($action) {
             exit;
         }
         break;
-
+    case 'add_supplier':
+    case 'delete_supplier':
+    case 'truncate_suppliers':
+        $supplierController->handleRequest();
+        exit;
     default:
         $products = $controller->getProducts();
         include __DIR__ . '/views/Admin/products-admin.php';
