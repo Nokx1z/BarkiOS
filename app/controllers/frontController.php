@@ -1,37 +1,59 @@
 <?php
-class frontController{
-    public $url;
+class FrontController {
+    private $url;
+    private $controller;
+    private $action;
+    private $params;
 
-    public function __construct($url)
-    {
-        $this->url = $this->sanitizeUrl($url);
-        $this->loadPage();
+    public function __construct() {
+        $this->parseUrl();
+        $this->loadController();
     }
 
-    private function sanitizeUrl($url) {
-        // Limpia la URL permitiendo solo letras, números y guiones
-        return preg_replace('/[^a-zA-Z0-9-]/', '', $url);
+    private function parseUrl() {
+        $request = $_SERVER['REQUEST_URI'] ?? '/';
+        $parsedUrl = parse_url($request);
+        $path = trim($parsedUrl['path'] ?? '', '/');
+        $query = $parsedUrl['query'] ?? '';
+        
+        // Extraer partes de la URL (formato: /controller/action/param1/param2)
+        $parts = explode('/', $path);
+        $this->controller = $this->sanitize($parts[0] ?? 'home');
+        $this->action = $this->sanitize($parts[1] ?? 'index');
+        $this->params = array_slice($parts, 2);
+        
+        // Parsear query string adicional
+        parse_str($query, $queryParams);
+        $this->params = array_merge($this->params, $queryParams);
     }
 
-    private function loadPage(){
-        // Ruta ABSOLUTA a los controladores
-        $controllersPath = __DIR__.'/../../app/controllers/';
+    private function sanitize($input) {
+        return preg_replace('/[^a-zA-Z0-9_-]/', '', $input);
+    }
+
+    private function loadController() {
+        $controllerFile = __DIR__.'/../../app/controllers/Admin/'.ucfirst($this->controller).'Controller.php';
         
-        // Primero intenta cargar el controlador solicitado
-        $requestedController = $controllersPath.$this->url.'Controller.php';
-        if (file_exists($requestedController)) {
-            require($requestedController);
-            return;
+        if (!file_exists($controllerFile)) {
+            die('Error 404: Controlador no encontrado');
         }
+
+        require_once $controllerFile;
         
-        // Si no existe, carga el homeController
-        $defaultController = $controllersPath.'homeController.php';
-        if (file_exists($defaultController)) {
-            require($defaultController);
-            return;
+        $controllerClass = 'App\\Controllers\\Admin\\'.ucfirst($this->controller).'Controller';
+        if (!class_exists($controllerClass)) {
+            die('Error 500: Clase del controlador no existe');
         }
+
+        $controller = new $controllerClass();
         
-        // Si no existe ninguno, muestra error
-        die('Error 004: No se encontró ningún controlador (ni '.$this->url.'Controller.php ni homeController.php)');
+        if (!method_exists($controller, $this->action)) {
+            die('Error 404: Acción no encontrada');
+        }
+
+        call_user_func_array([$controller, $this->action], $this->params);
     }
 }
+
+// Uso
+new FrontController();
