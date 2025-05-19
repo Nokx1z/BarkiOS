@@ -63,13 +63,13 @@ switch ($action) {
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="client$clientos.html">
+                    <a class="nav-link" href="./products-admin.php">
                         <i class="fas fa-tshirt"></i>
-                        client$clientos
+                        Productos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="ordenes.html">
+                    <a class="nav-link" href="./supplier-admin.php">
                         <i class="fas fa-shopping-cart"></i>
                         Proveedores
                     </a>
@@ -196,11 +196,24 @@ switch ($action) {
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Cédula</label>
-                            <input type="text" class="form-control" name="cedula" placeholder="Ej: V30803977" required>
+                            <input type="text" 
+                                class="form-control" 
+                                name="cedula" 
+                                placeholder="Ej: V30803977" 
+                                pattern="\d{6,8}" 
+                                maxlength="8" minlength="6"
+                                inputmode="numeric"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,8);"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Nombre</label>
-                            <input type="text" class="form-control" name="nombre" placeholder="Ingrese su nombre completo" required>
+                            <input type="text" class="form-control" 
+                                name="nombre" 
+                                placeholder="Ingrese su nombre completo" 
+                                pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+                                oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Dirección</label>
@@ -208,7 +221,15 @@ switch ($action) {
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Teléfono</label>
-                            <input type="text" class="form-control" name="telefono" placeholder="Ej: 04245555555" required>
+                            <input type="text" 
+                                class="form-control" 
+                                name="telefono" 
+                                placeholder="Ej: 04245555555" 
+                                pattern="\d{11}" 
+                                maxlength="11" minlength="11"
+                                inputmode="numeric"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,11);"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Membresía</label>
@@ -217,10 +238,6 @@ switch ($action) {
                                 <option value="vip">VIP</option>
                             </select>
                         </div>
-                        <!--<div class="mb-3">
-                            <label class="form-label">Precio</label>
-                            <input type="number" step="0.01" class="form-control" name="precio" required>
-                        </div>-->
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

@@ -181,7 +181,12 @@ switch ($action) {
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Nombre del Proveedor</label>
-                            <input type="text" class="form-control" name="nombre_contacto" placeholder="Ingrese nombre" required>
+                            <input type="text" class="form-control" 
+                                name="nombre_contacto" 
+                                placeholder="Ingrese nombre" 
+                                pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+                                oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Empresa</label>
@@ -189,7 +194,14 @@ switch ($action) {
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Rif</label>
-                            <input type="text" class="form-control" name="id" placeholder="Ingrese rif" required>
+                            <input type="text" class="form-control" 
+                                name="id" 
+                                placeholder="Ingrese rif" 
+                                pattern="\d{9}" 
+                                maxlength="9" minlength="9"
+                                inputmode="numeric"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,9);"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Tipo del rif</label>
