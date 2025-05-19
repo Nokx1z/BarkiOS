@@ -71,7 +71,7 @@ switch ($action) {
                 <li class="nav-item">
                     <a class="nav-link" href="ordenes.html">
                         <i class="fas fa-shopping-cart"></i>
-                        Órdenes
+                        Proveedores
                     </a>
                 </li>
                 <li class="nav-item">

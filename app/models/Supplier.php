@@ -15,8 +15,19 @@ class Supplier {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+        public function supplierExists($id) {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM proveedores WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetchColumn() > 0;
+    }
+
     // Agregar nuevo proveedor
     public function add( $id, $nombre_empresa, $nombre_contacto, $direccion, $tipo_rif) {
+
+            if ($this->supplierExists($id)) {
+            throw new Exception("Ya existe un cliente con esta cédula");
+        }
+
         $stmt = $this->db->prepare("
             INSERT INTO proveedores (id, nombre_contacto, nombre_empresa, direccion, tipo_rif)
             VALUES (:id, :nombre_empresa, :nombre_contacto, :direccion, :tipo_rif)

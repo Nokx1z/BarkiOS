@@ -41,7 +41,7 @@ switch ($action) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Productos - Garage Barki</title>
+    <title>Proveedores - Garage Barki</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -63,48 +63,30 @@ switch ($action) {
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="dashboard.html">
+                    <a class="nav-link" href="#">
                         <i class="fas fa-tachometer-alt"></i>
-                        Dashboard
+                        Inicio
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="productos.html">
+                    <a class="nav-link" href="/app/views/admin/products-admin.php">
                         <i class="fas fa-tshirt"></i>
                         Productos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="ordenes.html">
+                    <a class="nav-link active" href="/app/views/admin/supplier-admin.php">
                         <i class="fas fa-shopping-cart"></i>
-                        Órdenes
+                        Proveedores
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="/app/views/admin/clients-admin.php">
                         <i class="fas fa-users"></i>
                         Clientes
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-chart-bar"></i>
-                        Reportes
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-cog"></i>
-                        Configuración
-                    </a>
-                </li>
             </ul>
-            <div class="sidebar-footer">
-                <a class="nav-link" href="login.html">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Cerrar Sesión
-                </a>
-            </div>
         </div>
     </nav>
 
@@ -125,6 +107,17 @@ switch ($action) {
                     switch($_GET['success']) {
                         case 'add': echo 'Producto agregado correctamente'; break;
                         case 'delete': echo 'Producto eliminado correctamente'; break;
+                    }
+                    ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['error'])): ?>
+                <div class="alert alert-danger mt-3">
+                    <?php 
+                    if ($_GET['error'] === 'rif_duplicado') {
+                        $rif = isset($_GET['rif']) ? htmlspecialchars($_GET['rif']) : '[RIF no proporcionado]';
+                        echo "Error: El RIF <strong>$rif</strong> ya está registrado.";
                     }
                     ?>
                 </div>
