@@ -1,18 +1,18 @@
 <?php
-require_once __DIR__.'/../../models/SupplierModel.php';
+require_once __DIR__.'/../../models/Supplier.php';
 
 class SupplierController {
     private $supplierModel;
 
     public function __construct() {
-        $this->supplierModel = new SupplierModel();
+        $this->supplierModel = new Supplier();
     }
 
     public function handleRequest() {
         $action = $_GET['action'] ?? '';
 
         try {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add_supplier') {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
                 $this->handleAddSupplier();
             } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'delete') {
                 $this->handleDeleteSupplier();
@@ -24,12 +24,12 @@ class SupplierController {
         }
     }
 
-    public function getProducts() {
+    public function getSupplierr() {
         return $this->supplierModel->getAll();
     }
 
     private function handleAddSupplier() {
-        $required = ['tipo_rif', 'rif', 'direccion', 'nombre_empresa', 'nombre_contacto'];
+        $required = [ 'id', 'nombre_contacto' , 'nombre_empresa' , 'direccion' , 'tipo_rif'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
                 throw new Exception("El campo $field es requerido");
@@ -37,15 +37,15 @@ class SupplierController {
         }
 
         $success = $this->supplierModel->add(
-            htmlspecialchars(trim($_POST['tipo_rif'])),
-            htmlspecialchars(trim($_POST['rif'])),
-            htmlspecialchars(trim($_POST['direccion'])),
+            (int) $_POST['id'],
+            htmlspecialchars(trim($_POST['nombre_contacto'])),
             htmlspecialchars(trim($_POST['nombre_empresa'])),
-            htmlspecialchars(trim($_POST['nombre_contacto']))
+            htmlspecialchars(trim($_POST['direccion'])),
+            htmlspecialchars(trim($_POST['tipo_rif']))
         );
 
         if ($success) {
-            header('Location: ../app/views/admin/supplier-admin.php?success=add_supplier');
+            header('Location: supplier-admin.php?success=add');
             exit();
         }
     }
@@ -58,14 +58,14 @@ class SupplierController {
         $success = $this->supplierModel->delete((int)$_GET['id']);
 
         if ($success) {
-        header('Location: ../app/views/admin/supplier-admin.php?success=add_supplier');
+        header('Location: supplier-admin.php?success=delete');
             exit();
         }
     }
     
     private function handleTruncate() {
         $this->supplierModel->truncate();
-        header('Location: ../app/views/admin/supplier-admin.php?success=add_supplier');
+        header('Location: supplier-admin.php?success=add');
         exit();
     }
 }
@@ -73,4 +73,4 @@ class SupplierController {
 // Instanciar y ejecutar
 $controller = new SupplierController();
 $controller->handleRequest();
-$products = $controller->getProducts();
+$supplierr = $controller->getSupplierr();
