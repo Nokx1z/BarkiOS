@@ -21,6 +21,7 @@ class Product {
             INSERT INTO productos (id, nombre, tipo, categoria, precio)
             VALUES (:id, :nombre, :tipo, :categoria, :precio)
         ");
+        
         return $stmt->execute([
             ':id' => $id,
             ':nombre' => $nombre,

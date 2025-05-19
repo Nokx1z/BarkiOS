@@ -29,7 +29,8 @@ class ProductsController {
     }
 
     private function handleAddProduct() {
-        $required = ['nombre', 'categoria', 'precio'];
+        $required = [
+            'nombre', 'categoria', 'precio'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
                 throw new Exception("El campo $field es requerido");
