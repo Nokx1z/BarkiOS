@@ -173,8 +173,20 @@ $controller->handleRequest(); // maneja add/delete/truncate
                             </select>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Categoría</label>
+                            <select class="form-select" name="tipo" required>
+                                <option value="vestidos">Vestidos</option>
+                                <option value="blusas">Blusas</option>
+                                <option value="pantalones">Pantalones</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Precio</label>
                             <input type="number" step="0.01" class="form-control" name="precio" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" class="form-control" name="id" placeholder="Ingrese el id" required>
                         </div>
                     </div>
                     <div class="modal-footer">

@@ -36,10 +36,12 @@ class ProductsController {
             }
         }
 
-        $success = $this->productModel->add(
-            htmlspecialchars(trim($_POST['nombre'])),
-            htmlspecialchars(trim($_POST['categoria'])),
-            (float)$_POST['precio']
+     $success = $this->productModel->add(
+        htmlspecialchars(trim($_POST['id'])),
+        htmlspecialchars(trim($_POST['nombre'])),
+        htmlspecialchars(trim($_POST['tipo'])),
+        htmlspecialchars(trim($_POST['categoria'])),
+        (float)$_POST['precio']
         );
 
         if ($success) {
