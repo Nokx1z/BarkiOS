@@ -14,6 +14,8 @@ class ProductsController {
         try {
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
                 $this->handleAddProduct();
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit') {
+                $this->handleEditProduct();
             } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'delete') {
                 $this->handleDeleteProduct();
             }
@@ -22,37 +24,66 @@ class ProductsController {
         }
     }
 
-    public function getProductss() {
+    public function getProducts() {
         return $this->productModel->getAll();
     }
 
+    public function getProductById($id) {
+        return $this->productModel->getById($id);
+    }
+
     private function handleAddProduct() {
-        $required = [ 'id', 'nombre','tipo' , 'categoria', 'precio'];
+        $required = ['id', 'nombre', 'tipo', 'categoria', 'precio'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
                 throw new Exception("El campo $field es requerido");
             }
         }
 
-    $id = (int) $_POST['id'];
-    $nombre = htmlspecialchars(trim($_POST['nombre']));
-    $tipo = htmlspecialchars(trim($_POST['tipo']));
-    $categoria = htmlspecialchars(trim($_POST['categoria']));
-    $precio = (float)$_POST['precio'];
+        $id = (int) $_POST['id'];
+        $nombre = htmlspecialchars(trim($_POST['nombre']));
+        $tipo = htmlspecialchars(trim($_POST['tipo']));
+        $categoria = htmlspecialchars(trim($_POST['categoria']));
+        $precio = (float)$_POST['precio'];
 
-    // ✅ Verifica si ya existe antes de insertar
-    if ($this->productModel->productExists($id)) {
-        header("Location: products-admin.php?error=id_duplicado&id=" . urlencode($id));
-        exit();
+        if ($this->productModel->productExists($id)) {
+            header("Location: products-admin.php?error=id_duplicado&id=" . urlencode($id));
+            exit();
+        }
+
+        $success = $this->productModel->add($id, $nombre, $tipo, $categoria, $precio);
+
+        if ($success) {
+            header("Location: products-admin.php?success=add");
+            exit();
+        }
     }
 
-    // ✅ Si no existe, lo insertas
-    $success = $this->productModel->add($id, $nombre, $tipo, $categoria, $precio);
+    private function handleEditProduct() {
+        $required = ['id', 'nombre', 'tipo', 'categoria', 'precio'];
+        foreach ($required as $field) {
+            if (empty($_POST[$field])) {
+                throw new Exception("El campo $field es requerido");
+            }
+        }
 
-    if ($success) {
-        header("Location: products-admin.php?success=add");
-        exit();
-    }
+        $id = (int) $_POST['id'];
+        $nombre = htmlspecialchars(trim($_POST['nombre']));
+        $tipo = htmlspecialchars(trim($_POST['tipo']));
+        $categoria = htmlspecialchars(trim($_POST['categoria']));
+        $precio = (float)$_POST['precio'];
+
+        if (!$this->productModel->productExists($id)) {
+            header("Location: products-admin.php?error=producto_no_existe&id=" . urlencode($id));
+            exit();
+        }
+
+        $success = $this->productModel->update($id, $nombre, $tipo, $categoria, $precio);
+
+        if ($success) {
+            header("Location: products-admin.php?success=edit");
+            exit();
+        }
     }
 
     private function handleDeleteProduct() {
@@ -67,10 +98,9 @@ class ProductsController {
             exit();
         }
     }
-
 }
 
 // Instanciar y ejecutar
 $controller = new ProductsController();
 $controller->handleRequest();
-$productss = $controller->getProductss();
+$products = $controller->getProducts();
