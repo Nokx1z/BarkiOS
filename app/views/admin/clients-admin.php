@@ -57,13 +57,13 @@ switch ($action) {
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="dashboard.html">
+                    <a class="nav-link" href="#Profe_No_Hago_Nada">
                         <i class="fas fa-tachometer-alt"></i>
-                        Dashboard
+                        Inicio
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="client$clientos.html">
+                    <a class="nav-link" href="/app/views/admin/products-admin.php">
                         <i class="fas fa-tshirt"></i>
                         Productos
                     </a>
@@ -71,34 +71,16 @@ switch ($action) {
                 <li class="nav-item">
                     <a class="nav-link" href="ordenes.html">
                         <i class="fas fa-shopping-cart"></i>
-                        Órdenes
+                        Proveedores
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">
+                    <a class="nav-link active" href="/app/views/admin/clients-admin.php">
                         <i class="fas fa-users"></i>
                         Clientes
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-chart-bar"></i>
-                        Reportes
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-cog"></i>
-                        Configuración
-                    </a>
-                </li>
             </ul>
-            <div class="sidebar-footer">
-                <a class="nav-link" href="login.html">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Cerrar Sesión
-                </a>
-            </div>
         </div>
     </nav>
 
@@ -106,7 +88,7 @@ switch ($action) {
     <div class="main-content">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="display-6 fw-bold text-dark">GARAGE<span class="text-dark">BARKI</span></h1>
+                <h1 class="display-6 fw-bold text-dark">Clientes</h1>
             </div>
             <button class="btn btn-primary rounded-pill px-4 me-3" data-bs-toggle="modal" data-bs-target="#addclient$clientModal">
                 <i class="fas fa-plus me-1"></i> Añadir Cliente
@@ -196,11 +178,24 @@ switch ($action) {
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Cédula</label>
-                            <input type="text" class="form-control" name="cedula" placeholder="Ej: V30803977" required>
+                            <input type="text" 
+                                class="form-control" 
+                                name="cedula" 
+                                placeholder="Ej: V30803977" 
+                                pattern="\d{6,8}" 
+                                maxlength="8" minlength="6"
+                                inputmode="numeric"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,8);"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Nombre</label>
-                            <input type="text" class="form-control" name="nombre" placeholder="Ingrese su nombre completo" required>
+                            <input type="text" class="form-control" 
+                                name="nombre" 
+                                placeholder="Ingrese su nombre completo" 
+                                pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+                                oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Dirección</label>
@@ -208,7 +203,15 @@ switch ($action) {
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Teléfono</label>
-                            <input type="text" class="form-control" name="telefono" placeholder="Ej: 04245555555" required>
+                            <input type="text" 
+                                class="form-control" 
+                                name="telefono" 
+                                placeholder="Ej: 04245555555" 
+                                pattern="\d{11}" 
+                                maxlength="11" minlength="11"
+                                inputmode="numeric"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,11);"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Membresía</label>
@@ -217,10 +220,6 @@ switch ($action) {
                                 <option value="vip">VIP</option>
                             </select>
                         </div>
-                        <!--<div class="mb-3">
-                            <label class="form-label">Precio</label>
-                            <input type="number" step="0.01" class="form-control" name="precio" required>
-                        </div>-->
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
