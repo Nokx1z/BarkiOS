@@ -11,8 +11,42 @@ class Product {
 
     // Obtener todos los productos
     public function getAll() {
-        $stmt = $this->db->query("SELECT * FROM productos");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            // Verificar si la conexión está activa
+            if (!$this->db) {
+                error_log('[' . date('Y-m-d H:i:s') . '] Error: No hay conexión a la base de datos');
+                return [];
+            }
+            
+            // Verificar si la tabla existe
+            $tableExists = $this->db->query("SHOW TABLES LIKE 'productos'")->rowCount() > 0;
+            if (!$tableExists) {
+                error_log('[' . date('Y-m-d H:i:s') . '] Error: La tabla "productos" no existe en la base de datos');
+                return [];
+            }
+            
+            // Ejecutar consulta
+            $stmt = $this->db->query("SELECT * FROM productos ORDER BY id ASC");
+            
+            if ($stmt === false) {
+                $error = $this->db->errorInfo();
+                error_log('[' . date('Y-m-d H:i:s') . '] Error en la consulta SQL: ' . print_r($error, true));
+                return [];
+            }
+            
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            error_log('[' . date('Y-m-d H:i:s') . '] Productos encontrados: ' . count($result));
+            
+            return $result;
+            
+        } catch (PDOException $e) {
+            error_log('[' . date('Y-m-d H:i:s') . '] Error en Product::getAll(): ' . $e->getMessage());
+            error_log('[' . date('Y-m-d H:i:s') . '] Archivo: ' . $e->getFile() . ' Línea: ' . $e->getLine());
+            return [];
+        } catch (Exception $e) {
+            error_log('[' . date('Y-m-d H:i:s') . '] Error inesperado en Product::getAll(): ' . $e->getMessage());
+            return [];
+        }
     }
 
     // Verificar si un producto existe
