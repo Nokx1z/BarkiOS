@@ -1,5 +1,4 @@
 <?php
-// Incluimos el controlador y obtenemos los Supplieros
 require_once __DIR__.'/../../controllers/Admin/supplierController.php';
 
 $controller = new SupplierController();
