@@ -41,7 +41,7 @@ $supplier = $controller->getSupplierr();
                 <li class="nav-item">
                     <a class="nav-link" href="/app/views/admin/Suppliers-admin.php">
                         <i class="fas fa-tshirt"></i>
-                        Supplieros
+                        Productos
                     </a>
                 </li>
                 <li class="nav-item">
