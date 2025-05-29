@@ -1,16 +1,3 @@
-<?php
-// Incluimos el controlador
-//require_once __DIR__.'/../../controllers/Admin/ProductsController.php';
-require_once(__DIR__ . '/../../../vendor/autoload.php');
-use Barkios\controllers\Admin\ProductsController;
-// Inicializamos el controlador y manejamos la petición
-$controller = new ProductsController();
-$controller->handleRequest();
-
-// Obtenemos los productos para la carga inicial
-$products = $controller->getProducts();
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -529,7 +516,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Enviar datos por AJAX
-        fetch('products-admin.php?action=add_ajax', {
+        //Toma el index
+        fetch('index.php?controller=products&action=add_ajax', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -882,8 +870,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Enviar solicitud de eliminación
                 const formData = new URLSearchParams();
                 formData.append('id', productId);
-                
-                fetch('products-admin.php?action=delete_ajax', {
+                //Toma el index y la accion de eliminar
+                fetch('index.php?controller=products&action=delete_ajax', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -1073,6 +1061,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initTooltips();
 
     // Cerrar el manejador DOMContentLoaded
+    
 });
 </script>
 </body>

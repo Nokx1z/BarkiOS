@@ -6,11 +6,11 @@ use Exception;
 
 class ProductsController {
     private $productModel;
-
+    // ───── Constructor ─────
     public function __construct() {
         $this->productModel = new Product();
     }
-
+    // ───── Enrutador principal ─────
     public function handleRequest() {
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
@@ -35,7 +35,8 @@ class ProductsController {
                 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'get_products') {
                     $this->getProductsAjax();
                 } else {
-                    throw new Exception('Acción no válida');
+                    //throw new Exception('Acción no válida');
+                    $this->index();
                 }
             } else {
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
@@ -69,7 +70,7 @@ class ProductsController {
             exit();
         }
     }
-
+    // ───── Métodos de Productos (NO AJAX) ─────
     public function getProducts() {
         return $this->productModel->getAll();
     }
@@ -144,7 +145,15 @@ class ProductsController {
             exit();
         }
     }
-    
+    //Este metodo es el que me permite cargar el ajax desde la vista 
+    public function add_ajax() {
+        $this->handleAddProductAjax();
+    }
+
+    public function  delete_ajax(){
+        $this->handleDeleteProductAjax();
+    }
+    // ───── Métodos AJAX ─────
     // AJAX Handlers
     private function handleAddProductAjax() {
         // Clear any previous output
@@ -253,11 +262,6 @@ class ProductsController {
         }
     }
     
-    public function index() {
-        $products = $this->getProducts();
-        require __DIR__ . '/../../views/admin/products-admin.php';
-    }
-    
     private function handleDeleteProductAjax() {
         // Clear any previous output
         if (ob_get_length()) ob_clean();
@@ -302,7 +306,8 @@ class ProductsController {
             exit();
         }
     }
-    
+
+    // ───── Utilidades ─────
     private function getProductsAjax() {
         // Limpiar cualquier salida previa
         while (ob_get_level()) ob_end_clean();
@@ -376,7 +381,16 @@ class ProductsController {
         // Asegurarse de que no se envíe nada más
         exit();
     }
+    public function index() {
+        $products = $this->getProducts();
+        require __DIR__ . '/../../views/admin/products-admin.php';
+    }
 }
 
+$controller = new ProductsController();
+$controller->handleRequest();
+
+// Obtenemos los productos para la carga inicial
+$products = $controller->getProducts();
 // El controlador debe ser instanciado y ejecutado desde el archivo que lo requiera
 // Por ejemplo, desde products-admin.php
