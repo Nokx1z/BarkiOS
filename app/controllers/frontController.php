@@ -1,11 +1,9 @@
 <?php
 namespace Barkios\controllers;
-
 class FrontController {
-    private $controller = 'products';
-    private $action = 'index';
+    private $controller;
+    private $action;
     private $params = [];
-    private $isAdmin = false;
 
     public function __construct() {
         $this->parseUrl();
@@ -14,38 +12,25 @@ class FrontController {
 
     private function parseUrl() {
         $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
-        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-        $basePath = str_replace('\\', '/', dirname($scriptName));
-        $path = str_replace($basePath, '', $requestUri);
-        $path = preg_replace('#^/index\.php#', '', $path);
-        $path = trim(parse_url($path, PHP_URL_PATH), '/');
-        $segments = $path ? explode('/', $path) : [];
+        $scriptName = $_SERVER['SCRIPT_NAME']; // Ej: /app/index.php
 
-        // Detectar si es admin
+        // Elimina /app/index.php del inicio de la URI
+        $path = str_replace(dirname($scriptName), '', $requestUri);
+        $path = preg_replace('#^/index\.php#', '', $path); // elimina index.php
+        $path = trim(parse_url($path, PHP_URL_PATH), '/'); // elimina ?params y slashes
+
+        $segments = explode('/', $path);
+
+        // Ignorar 'admin' si es el primer segmento
         if (isset($segments[0]) && strtolower($segments[0]) === 'admin') {
-            $this->isAdmin = true;
-            array_shift($segments);
+            array_shift($segments); // quita 'admin'
         }
 
-        // Asignar controlador y acción
-        if (isset($segments[0]) && $segments[0] !== '') {
-            $this->controller = $this->sanitize($segments[0]);
-        }
-        if (isset($segments[1]) && $segments[1] !== '') {
-            $this->action = $this->sanitize($segments[1]);
-        }
-
-        // El resto son parámetros
+        $this->controller = $this->sanitize($segments[0] ?? 'products');
+        $this->action = $this->sanitize($segments[1] ?? 'index');
         $this->params = array_slice($segments, 2);
-
-        // Permitir override por GET (útil para AJAX)
-        if (isset($_GET['controller'])) {
-            $this->controller = $this->sanitize($_GET['controller']);
-        }
-        if (isset($_GET['action'])) {
-            $this->action = $this->sanitize($_GET['action']);
-        }
     }
+
 
     private function sanitize($input) {
         return preg_replace('/[^a-zA-Z0-9_]/', '', $input);
@@ -53,27 +38,22 @@ class FrontController {
 
     private function loadController() {
         $controllerName = ucfirst($this->controller) . 'Controller';
-        $controllerDir = $this->isAdmin ? '/Admin/' : '/';
-        $controllerFile = __DIR__ . $controllerDir . $controllerName . '.php';
+        $controllerFile = __DIR__ . '/Admin/' . $controllerName . '.php';
 
         if (!file_exists($controllerFile)) {
-            http_response_code(404);
             die("Error 404: Controlador no encontrado ($controllerFile)");
         }
 
         require_once $controllerFile;
-        $namespace = 'Barkios\\controllers' . ($this->isAdmin ? '\\Admin\\' : '\\');
-        $fullClassName = $namespace . $controllerName;
+        $fullClassName = 'Barkios\\controllers\\Admin\\' . $controllerName;
 
         if (!class_exists($fullClassName)) {
-            http_response_code(500);
-            die("Error 500: Clase del controlador no existe ($fullClassName)");
+            die("Error 500: Clase del controlador no existe ($controllerName)");
         }
 
         $controller = new $fullClassName();
 
         if (!method_exists($controller, $this->action)) {
-            http_response_code(404);
             die("Error 404: Acción '{$this->action}' no encontrada.");
         }
 
