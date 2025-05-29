@@ -1,5 +1,8 @@
 <?php
-require_once __DIR__.'/../../models/Supplier.php';
+namespace Barkios\controllers\Admin;
+use Barkios\models\Supplier;
+use Exception;
+//require_once __DIR__.'/../../models/Supplier.php';
 
 class SupplierController {
     private $supplierModel;

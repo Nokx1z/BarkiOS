@@ -1,7 +1,8 @@
 <?php
 // Incluimos el controlador
-require_once __DIR__.'/../../controllers/Admin/ProductsController.php';
-
+//require_once __DIR__.'/../../controllers/Admin/ProductsController.php';
+require_once(__DIR__ . '/../../../vendor/autoload.php');
+use Barkios\controllers\Admin\ProductsController;
 // Inicializamos el controlador y manejamos la petición
 $controller = new ProductsController();
 $controller->handleRequest();

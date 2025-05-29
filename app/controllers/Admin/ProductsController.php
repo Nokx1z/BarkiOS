@@ -1,5 +1,8 @@
 <?php
-require_once __DIR__.'/../../models/Product.php';
+namespace Barkios\controllers\Admin;
+use Barkios\models\Product;
+use Exception;
+//require_once __DIR__.'/../../models/Product.php';
 
 class ProductsController {
     private $productModel;
@@ -248,6 +251,11 @@ class ProductsController {
         } else {
             throw new Exception("Error al actualizar el producto");
         }
+    }
+    
+    public function index() {
+        $products = $this->getProducts();
+        require __DIR__ . '/../../views/admin/products-admin.php';
     }
     
     private function handleDeleteProductAjax() {

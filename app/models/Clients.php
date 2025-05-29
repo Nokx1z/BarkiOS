@@ -1,5 +1,10 @@
 <?php
-require_once __DIR__.'/../core/Database.php';
+namespace Barkios\models;
+use Barkios\core\Database;
+//require_once __DIR__.'/../core/Database.php';
+
+use PDO;
+use Exception;
 
 class Clients {
     private $db;

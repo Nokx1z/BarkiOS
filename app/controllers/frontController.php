@@ -1,4 +1,5 @@
 <?php
+namespace Barkios\controllers;
 class FrontController {
     private $controller;
     private $action;
@@ -13,18 +14,23 @@ class FrontController {
         $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
         $scriptName = $_SERVER['SCRIPT_NAME']; // Ej: /app/index.php
 
-        $basePath = str_replace('/index.php', '', $scriptName); // /app
-        $relativeUri = str_replace($basePath, '', $requestUri); // /admin/products...
+        // Elimina /app/index.php del inicio de la URI
+        $path = str_replace(dirname($scriptName), '', $requestUri);
+        $path = preg_replace('#^/index\.php#', '', $path); // elimina index.php
+        $path = trim(parse_url($path, PHP_URL_PATH), '/'); // elimina ?params y slashes
 
-        $uriParts = explode('?', $relativeUri);
-        $path = trim($uriParts[0], '/');
         $segments = explode('/', $path);
 
-        // /admin/products/index
-        $this->controller = $this->sanitize($segments[1] ?? 'products');
-        $this->action = $this->sanitize($segments[2] ?? 'index');
-        $this->params = array_slice($segments, 3);
+        // Ignorar 'admin' si es el primer segmento
+        if (isset($segments[0]) && strtolower($segments[0]) === 'admin') {
+            array_shift($segments); // quita 'admin'
+        }
+
+        $this->controller = $this->sanitize($segments[0] ?? 'products');
+        $this->action = $this->sanitize($segments[1] ?? 'index');
+        $this->params = array_slice($segments, 2);
     }
+
 
     private function sanitize($input) {
         return preg_replace('/[^a-zA-Z0-9_]/', '', $input);
@@ -39,12 +45,13 @@ class FrontController {
         }
 
         require_once $controllerFile;
+        $fullClassName = 'Barkios\\controllers\\Admin\\' . $controllerName;
 
-        if (!class_exists($controllerName)) {
+        if (!class_exists($fullClassName)) {
             die("Error 500: Clase del controlador no existe ($controllerName)");
         }
 
-        $controller = new $controllerName();
+        $controller = new $fullClassName();
 
         if (!method_exists($controller, $this->action)) {
             die("Error 404: Acción '{$this->action}' no encontrada.");
@@ -53,7 +60,3 @@ class FrontController {
         call_user_func_array([$controller, $this->action], $this->params);
     }
 }
-
-
-// Uso
-new FrontController();

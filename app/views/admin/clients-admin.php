@@ -1,7 +1,8 @@
 <?php
 // Incluimos el controlador y obtenemos los productos
-require_once __DIR__.'/../../controllers/Admin/ClientsController.php';
-
+//require_once __DIR__.'/../../controllers/Admin/ClientsController.php';
+require_once '../vendor/autoload.php';
+use Barkios\controllers\Admin\ClientsController;
 $controller = new ClientsController();
 
 $action = $_GET['action'] ?? null;

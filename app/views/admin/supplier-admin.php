@@ -1,6 +1,7 @@
 <?php
-require_once __DIR__.'/../../controllers/Admin/supplierController.php';
-
+//require_once __DIR__.'/../../controllers/Admin/supplierController.php';
+require_once '../vendor/autoload.php';
+use Barkios\controllers\Admin\SupplierController;
 $controller = new SupplierController();
 $supplier = $controller->getSupplierr();
 ?>

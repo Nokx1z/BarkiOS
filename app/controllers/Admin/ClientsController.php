@@ -1,5 +1,8 @@
 <?php
-require_once __DIR__.'/../../models/Clients.php';
+namespace Barkios\controllers\Admin;
+use Barkios\models\Clients;
+use Exception;
+//require_once __DIR__.'/../../models/Clients.php';
 
 class ClientsController {
     private $clientsModel;
