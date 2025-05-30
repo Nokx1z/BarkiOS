@@ -52,12 +52,6 @@ class Supplier {
         }
     }
 
-    // Vaciar la tabla de proveedores
-    public function truncate() {
-        $stmt = $this->db->prepare("TRUNCATE TABLE proveedores");
-        return $stmt->execute();
-    }
-
     // Eliminar proveedor por ID
     public function delete($id) {
         $stmt = $this->db->prepare("DELETE FROM proveedores WHERE id = :id");
