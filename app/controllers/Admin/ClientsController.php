@@ -10,7 +10,7 @@ class ClientsController {
     public function __construct() {
         $this->clientsModel = new Clients();
     }
-
+//Función para obtener el metodo de la petición
     public function handleRequest() {
         $action = $_GET['action'] ?? '';
         $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
