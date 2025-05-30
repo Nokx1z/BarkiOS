@@ -19,7 +19,6 @@ class ProductsController {
         $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
         
-        // Start output buffering to catch any accidental output
         ob_start();
         
         try {
