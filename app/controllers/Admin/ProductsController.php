@@ -144,6 +144,7 @@ class ProductsController {
             exit();
         }
     }
+    
     //Este metodo es el que me permite cargar el ajax desde la vista 
     public function add_ajax() {
         $this->handleAddProductAjax();
@@ -380,6 +381,7 @@ class ProductsController {
         // Asegurarse de que no se envíe nada más
         exit();
     }
+    
     public function index() {
         $products = $this->getProducts();
         require __DIR__ . '/../../views/admin/products-admin.php';
