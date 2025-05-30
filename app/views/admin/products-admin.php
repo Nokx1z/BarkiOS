@@ -17,7 +17,7 @@
 </head>
 <body>
 
-        <nav class="sidebar" id="sidebar">
+    <nav class="sidebar" id="sidebar">
         <div class="sidebar-sticky">
             <div class="sidebar-header">
                 <h3>GARAGE<span>BARKI</span></h3>
@@ -25,25 +25,25 @@
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="#Profe_No_Hago_Nada">
+                    <a class="nav-link" href="/app/admin/products/">
                         <i class="fas fa-tachometer-alt"></i>
                         Inicio
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/app/views/admin/products-admin.php">
+                    <a class="nav-link" href="/app/admin/products/">
                         <i class="fas fa-tshirt"></i>
                         Productos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/app/views/admin/supplier-admin.php">
+                    <a class="nav-link" href="/app/admin/supplier/">
                         <i class="fas fa-shopping-cart"></i>
                         Proveedores
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/app/views/admin/clients-admin.php">
+                    <a class="nav-link" href="/app/admin/clients/">
                         <i class="fas fa-users"></i>
                         Clientes
                     </a>

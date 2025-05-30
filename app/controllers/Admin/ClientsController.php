@@ -153,6 +153,11 @@ class ClientsController {
         header("Location: clients-admin.php?success=add");
         exit();
     }
+
+    public function index() {
+        $products = $this->getclientss();
+        require __DIR__ . '/../../views/admin/clients-admin.php';
+    }
 }
 
 // Instanciar y ejecutar
