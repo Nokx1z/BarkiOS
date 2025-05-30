@@ -275,7 +275,7 @@
                     submitButton.disabled = true;
                     submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
                     
-                    fetch('index.php?controller=clients&action=add_ajax', {
+                    fetch('index.php?action=add', {
                         method: 'POST',
                         body: formData,
                         headers: {
