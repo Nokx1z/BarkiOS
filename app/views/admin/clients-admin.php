@@ -357,7 +357,7 @@
                     reverseButtons: true,
                     showLoaderOnConfirm: true,
                     preConfirm: () => {
-                        return fetch(`index.php?controller=clients&action=delete&cedula=${cedula}`, {
+                        return fetch(`clients-admin.php?action=delete&cedula=${cedula}`, {
                             method: 'GET',
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest',
