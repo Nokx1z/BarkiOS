@@ -1,34 +1,3 @@
-<?php
-// Incluimos el controlador y obtenemos los productos
-require_once __DIR__.'/../../controllers/Admin/ClientsController.php';
-
-$controller = new ClientsController();
-
-$action = $_GET['action'] ?? null;
-
-switch ($action) {
-    case 'delete':
-        if (isset($_GET['id'])) {
-            $controller->deleteClient($_GET['id']);
-            header('Location: clients-admin.php?success=delete');
-            exit;
-        }
-        break;
-
-    case 'add':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $controller->addClient($_POST['cedula'], $_POST['nombre'], $_POST['dirección'], $_POST['telefono'], $_POST['membresia']);
-            header('Location: clients-admin.php?success=add');
-            exit;
-        }
-        break;
-
-    default:
-        $clientes = $controller->getclientss();
-        break;
-}
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -49,7 +18,7 @@ switch ($action) {
 </head>
 <body>
 
-        <nav class="sidebar" id="sidebar">
+    <nav class="sidebar" id="sidebar">
         <div class="sidebar-sticky">
             <div class="sidebar-header">
                 <h3>GARAGE<span>BARKI</span></h3>
@@ -57,25 +26,25 @@ switch ($action) {
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="/app/admin/products/">
                         <i class="fas fa-tachometer-alt"></i>
                         Inicio
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="/app/admin/products/">
                         <i class="fas fa-tshirt"></i>
                         Productos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="/app/admin/supplier/">
                         <i class="fas fa-shopping-cart"></i>
                         Proveedores
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="./clients-admin.php">
+                    <a class="nav-link" href="/app/admin/clients/">
                         <i class="fas fa-users"></i>
                         Clientes
                     </a>
@@ -83,6 +52,7 @@ switch ($action) {
             </ul>
         </div>
     </nav>
+
 
     <!-- Main Content -->
     <div class="main-content">
@@ -305,7 +275,7 @@ switch ($action) {
                     submitButton.disabled = true;
                     submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
                     
-                    fetch('clients-admin.php?action=add', {
+                    fetch('index.php?action=add', {
                         method: 'POST',
                         body: formData,
                         headers: {

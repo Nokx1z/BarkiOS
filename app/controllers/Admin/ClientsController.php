@@ -1,5 +1,8 @@
 <?php
-require_once __DIR__.'/../../models/Clients.php';
+namespace Barkios\controllers\Admin;
+use Barkios\models\Clients;
+use Exception;
+//require_once __DIR__.'/../../models/Clients.php';
 
 class ClientsController {
     private $clientsModel;
@@ -149,6 +152,11 @@ class ClientsController {
         $this->clientsModel->truncate();
         header("Location: clients-admin.php?success=add");
         exit();
+    }
+
+    public function index() {
+        $products = $this->getclientss();
+        require __DIR__ . '/../../views/admin/clients-admin.php';
     }
 }
 

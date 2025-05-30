@@ -1,15 +1,3 @@
-<?php
-// Incluimos el controlador
-require_once __DIR__.'/../../controllers/Admin/ProductsController.php';
-
-// Inicializamos el controlador y manejamos la petición
-$controller = new ProductsController();
-$controller->handleRequest();
-
-// Obtenemos los productos para la carga inicial
-$products = $controller->getProducts();
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -29,7 +17,7 @@ $products = $controller->getProducts();
 </head>
 <body>
 
-        <nav class="sidebar" id="sidebar">
+    <nav class="sidebar" id="sidebar">
         <div class="sidebar-sticky">
             <div class="sidebar-header">
                 <h3>GARAGE<span>BARKI</span></h3>
@@ -37,25 +25,25 @@ $products = $controller->getProducts();
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="#Profe_No_Hago_Nada">
+                    <a class="nav-link" href="/app/admin/products/">
                         <i class="fas fa-tachometer-alt"></i>
                         Inicio
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/app/views/admin/products-admin.php">
+                    <a class="nav-link" href="/app/admin/products/">
                         <i class="fas fa-tshirt"></i>
                         Productos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/app/views/admin/supplier-admin.php">
+                    <a class="nav-link" href="/app/admin/supplier/">
                         <i class="fas fa-shopping-cart"></i>
                         Proveedores
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/app/views/admin/clients-admin.php">
+                    <a class="nav-link" href="/app/admin/clients/">
                         <i class="fas fa-users"></i>
                         Clientes
                     </a>
@@ -528,7 +516,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Enviar datos por AJAX
-        fetch('products-admin.php?action=add_ajax', {
+        //Toma el index
+        fetch('index.php?controller=products&action=add_ajax', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -881,8 +870,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Enviar solicitud de eliminación
                 const formData = new URLSearchParams();
                 formData.append('id', productId);
-                
-                fetch('products-admin.php?action=delete_ajax', {
+                //Toma el index y la accion de eliminar
+                fetch('index.php?controller=products&action=delete_ajax', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -1072,6 +1061,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initTooltips();
 
     // Cerrar el manejador DOMContentLoaded
+    
 });
 </script>
 </body>

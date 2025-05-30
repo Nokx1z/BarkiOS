@@ -1,9 +1,3 @@
-<?php
-require_once __DIR__.'/../../controllers/Admin/supplierController.php';
-
-$controller = new SupplierController();
-$supplier = $controller->getSupplierr();
-?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -24,7 +18,7 @@ $supplier = $controller->getSupplierr();
 </head>
 <body>
 
-        <nav class="sidebar" id="sidebar">
+    <nav class="sidebar" id="sidebar">
         <div class="sidebar-sticky">
             <div class="sidebar-header">
                 <h3>GARAGE<span>BARKI</span></h3>
@@ -32,25 +26,25 @@ $supplier = $controller->getSupplierr();
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="#Profe_No_Hago_Nada">
+                    <a class="nav-link" href="/app/admin/products/">
                         <i class="fas fa-tachometer-alt"></i>
                         Inicio
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/app/views/admin/Suppliers-admin.php">
+                    <a class="nav-link" href="/app/admin/products/">
                         <i class="fas fa-tshirt"></i>
                         Productos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/app/views/admin/supplier-admin.php">
+                    <a class="nav-link" href="/app/admin/supplier/">
                         <i class="fas fa-shopping-cart"></i>
                         Proveedores
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/app/views/admin/clients-admin.php">
+                    <a class="nav-link" href="/app/admin/clients/">
                         <i class="fas fa-users"></i>
                         Clientes
                     </a>
@@ -227,7 +221,7 @@ $supplier = $controller->getSupplierr();
             $table.addClass('d-none');
             
             $.ajax({
-                url: 'supplier-admin.php?action=get_suppliers',
+                url: 'index.php?controller=supplier&action=get_suppliers',
                 type: 'GET',
                 dataType: 'json',
                 success: function(suppliers) {
@@ -303,7 +297,7 @@ $supplier = $controller->getSupplierr();
             };
             
             // Configurar la URL con el parámetro de acción
-            const url = 'supplier-admin.php?action=add_ajax';
+            const url = 'index.php?controller=supplier&action=add_ajax';
             
             // Validación del lado del cliente
             if (!formData.id || formData.id.length !== 9) {
@@ -407,7 +401,7 @@ $supplier = $controller->getSupplierr();
                     return new Promise((resolve) => {
                         console.log('Enviando solicitud de eliminación para el proveedor ID:', supplierId);
                         
-const deleteUrl = `supplier-admin.php?action=delete_ajax`;
+const deleteUrl = `index.php?controller=supplier&action=delete_ajax`;
                         console.log('Enviando eliminación a:', deleteUrl, 'ID:', supplierId);
                         
                         $.ajax({

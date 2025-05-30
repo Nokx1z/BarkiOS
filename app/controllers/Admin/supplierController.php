@@ -1,5 +1,8 @@
 <?php
-require_once __DIR__.'/../../models/Supplier.php';
+namespace Barkios\controllers\Admin;
+use Barkios\models\Supplier;
+use Exception;
+//require_once __DIR__.'/../../models/Supplier.php';
 
 class SupplierController {
     private $supplierModel;
@@ -70,6 +73,56 @@ class SupplierController {
 
     public function getSupplierr() {
         return $this->supplierModel->getAll();
+    }
+
+    private function handleAddSupplier() {
+        $required = ['id', 'nombre_contacto', 'nombre_empresa', 'direccion', 'tipo_rif'];
+        foreach ($required as $field) {
+            if (empty($_POST[$field])) {
+                throw new Exception("El campo $field es requerido");
+            }
+        }
+
+        $rif = (int) $_POST['id'];
+        $nombre_contacto = htmlspecialchars(trim($_POST['nombre_contacto']));
+        $nombre_empresa = htmlspecialchars(trim($_POST['nombre_empresa']));
+        $direccion = htmlspecialchars(trim($_POST['direccion']));
+        $tipo_rif = htmlspecialchars(trim($_POST['tipo_rif']));
+
+        // Verifica si ya existe antes de insertar
+        if ($this->supplierModel->supplierExists($rif)) {
+            header("Location: supplier-admin.php?error=rif_duplicado&rif=" . urlencode($rif));
+            exit();
+        }
+
+        // Si no existe, lo insertas
+        $success = $this->supplierModel->add($rif, $nombre_contacto, $nombre_empresa, $direccion, $tipo_rif);
+
+        if ($success) {
+            header("Location: supplier-admin.php?success=add");
+            exit();
+        }
+    }
+
+    private function handleDeleteSupplier() {
+        if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+            throw new Exception("ID de producto inválido");
+        }
+
+        $success = $this->supplierModel->delete((int)$_GET['id']);
+
+        if ($success) {
+        header('Location: supplier-admin.php?success=delete');
+            exit();
+        }
+    }
+
+    public function add_ajax() {
+        $this->handleAddSupplierAjax();
+    }
+
+    public function  delete_ajax(){
+        $this->handleDeleteSupplierAjax();
     }
 
     private function handleAddSupplierAjax() {
@@ -175,46 +228,9 @@ class SupplierController {
         exit();
     }
 
-    private function handleAddSupplier() {
-        $required = ['id', 'nombre_contacto', 'nombre_empresa', 'direccion', 'tipo_rif'];
-        foreach ($required as $field) {
-            if (empty($_POST[$field])) {
-                throw new Exception("El campo $field es requerido");
-            }
-        }
-
-        $rif = (int) $_POST['id'];
-        $nombre_contacto = htmlspecialchars(trim($_POST['nombre_contacto']));
-        $nombre_empresa = htmlspecialchars(trim($_POST['nombre_empresa']));
-        $direccion = htmlspecialchars(trim($_POST['direccion']));
-        $tipo_rif = htmlspecialchars(trim($_POST['tipo_rif']));
-
-        // ✅ Verifica si ya existe antes de insertar
-        if ($this->supplierModel->supplierExists($rif)) {
-            header("Location: supplier-admin.php?error=rif_duplicado&rif=" . urlencode($rif));
-            exit();
-        }
-
-        // ✅ Si no existe, lo insertas
-        $success = $this->supplierModel->add($rif, $nombre_contacto, $nombre_empresa, $direccion, $tipo_rif);
-
-        if ($success) {
-            header("Location: supplier-admin.php?success=add");
-            exit();
-        }
-    }
-
-    private function handleDeleteSupplier() {
-        if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-            throw new Exception("ID de producto inválido");
-        }
-
-        $success = $this->supplierModel->delete((int)$_GET['id']);
-
-        if ($success) {
-        header('Location: supplier-admin.php?success=delete');
-            exit();
-        }
+public function index() {
+        $supplier = $this->getSupplierr();
+        require __DIR__ . '/../../Views/Admin/supplier-admin.php';
     }
 }
 

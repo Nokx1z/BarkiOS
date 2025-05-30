@@ -1,5 +1,12 @@
 <?php
-require_once __DIR__ . '/../core/Database.php';
+namespace Barkios\models;
+use Barkios\core\Database;
+
+
+use PDO;
+use Exception;
+use PDOException;
+//require_once __DIR__ . '/../core/Database.php';
 
 class Supplier {
     private $db;

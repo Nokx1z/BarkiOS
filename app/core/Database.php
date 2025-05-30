@@ -1,4 +1,8 @@
 <?php
+namespace Barkios\core;
+use PDO;
+use PDOException;
+
 class Database {
     private static $instance = null;
     private $pdo;
