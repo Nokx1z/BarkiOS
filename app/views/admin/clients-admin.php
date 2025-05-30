@@ -275,7 +275,7 @@
                     submitButton.disabled = true;
                     submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
                     
-                    fetch('index.php?controller=clients&action=add_ajax', {
+                    fetch('index.php?action=add', {
                         method: 'POST',
                         body: formData,
                         headers: {
@@ -357,7 +357,7 @@
                     reverseButtons: true,
                     showLoaderOnConfirm: true,
                     preConfirm: () => {
-                        return fetch(`index.php?controller=clients&action=delete&cedula=${cedula}`, {
+                        return fetch(`clients-admin.php?action=delete&cedula=${cedula}`, {
                             method: 'GET',
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest',
