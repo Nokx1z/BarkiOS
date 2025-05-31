@@ -1,16 +1,36 @@
 <?php
 namespace Barkios\controllers\Admin;
+
 use Barkios\models\Clients;
 use Exception;
-//require_once __DIR__.'/../../models/Clients.php';
 
+/**
+ * Controlador para la gestión de clientes en el área de administración
+ * 
+ * Maneja las operaciones CRUD para los clientes, incluyendo:
+ * - Listado de clientes
+ * - Agregar nuevos clientes
+ * - Eliminar clientes existentes
+ */
 class ClientsController {
+    /** @var Clients Instancia del modelo de clientes */
     private $clientsModel;
 
+    /**
+     * Constructor de la clase
+     * 
+     * Inicializa una nueva instancia del modelo de clientes
+     */
     public function __construct() {
         $this->clientsModel = new Clients();
     }
-//Función para obtener el metodo de la petición
+
+    /**
+     * Maneja las peticiones entrantes y las redirige al método correspondiente
+     * 
+     * Detecta el tipo de petición (GET/POST) y la acción solicitada,
+     * luego llama al método correspondiente para manejar la acción
+     */
     public function handleRequest() {
         $action = $_GET['action'] ?? '';
         $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
@@ -40,19 +60,29 @@ class ClientsController {
         }
     }
 
+    /**
+     * Obtiene todos los clientes
+     * 
+     * @return array Lista de clientes
+     */
     public function getclientss() {
         return $this->clientsModel->getAll();
     }
 
+    /**
+     * Maneja la adición de un nuevo cliente
+     * 
+     * Procesa el formulario de agregar cliente, valida los datos
+     * y devuelve una respuesta JSON si es una petición AJAX
+     * o redirige a la página correspondiente en caso contrario
+     */
     private function handleAddclients() {
-        // Verificar si es una petición AJAX
         $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
         
         $response = ['success' => false, 'message' => ''];
         
         try {
-            // Limpiar cualquier salida anterior
             if (ob_get_length()) ob_clean();
             $required = ['cedula', 'nombre', 'direccion', 'telefono', 'membresia'];
             foreach ($required as $field) {
@@ -106,15 +136,20 @@ class ClientsController {
         }
     }
 
+    /**
+     * Maneja la eliminación de un cliente
+     * 
+     * Procesa la solicitud de eliminación de un cliente por su cédula
+     * Devuelve una respuesta JSON si es una petición AJAX
+     * o redirige a la página correspondiente en caso contrario
+     */
     private function handleDeleteclients() {
-        // Verificar si es una petición AJAX
         $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
         
         $response = ['success' => false, 'message' => ''];
         
         try {
-            // Limpiar cualquier salida anterior
             if (ob_get_length()) ob_clean();
             if (!isset($_GET['cedula']) || empty($_GET['cedula'])) {
                 throw new Exception("Cédula de cliente inválida");
@@ -148,19 +183,30 @@ class ClientsController {
         }
     }
     
+    /**
+     * Maneja el vaciado de la tabla de clientes
+     * 
+     * Elimina todos los registros de clientes y redirige a la página principal
+     * con un mensaje de éxito
+     */
     private function handleTruncate() {
         $this->clientsModel->truncate();
         header("Location: clients-admin.php?success=add");
         exit();
     }
 
+    /**
+     * Muestra la vista principal de administración de clientes
+     * 
+     * Obtiene la lista de clientes y carga la vista correspondiente
+     */
     public function index() {
         $products = $this->getclientss();
         require __DIR__ . '/../../views/admin/clients-admin.php';
     }
 }
 
-// Instanciar y ejecutar
+// Inicialización del controlador y manejo de la solicitud
 $controller = new ClientsController();
 $controller->handleRequest();
 $clientss = $controller->getclientss();

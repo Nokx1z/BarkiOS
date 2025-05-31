@@ -1,6 +1,16 @@
+<?php
+/**
+ * Vista de administración de clientes
+ * 
+ * Esta vista muestra la interfaz de usuario para gestionar los clientes del sistema.
+ * Incluye un formulario para agregar nuevos clientes y una tabla para visualizar
+ * y eliminar los clientes existentes.
+ */
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Metadatos y enlaces a recursos externos -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clientes - Garage Barki</title>
@@ -18,6 +28,7 @@
 </head>
 <body>
 
+    <!-- Barra lateral de navegación -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-sticky">
             <div class="sidebar-header">
@@ -54,7 +65,7 @@
     </nav>
 
 
-    <!-- Main Content -->
+    <!-- Contenido principal de la página -->
     <div class="main-content">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -65,7 +76,7 @@
             </button>
             
 
-            <!-- Mensajes de éxito/error -->
+            <!-- Sección para mostrar mensajes de éxito o error -->
             <?php if (isset($_GET['success'])): ?>
                 <div class="alert alert-success mt-3">
                     <?php 
@@ -88,7 +99,7 @@
     </div>
 <?php endif; ?>
 
-            <!-- Tabla de Clientes -->
+            <!-- Tabla que muestra el listado de clientes -->
             <div class="card mt-3">
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -136,7 +147,7 @@
         </div>
     </div>
 
-    <!-- Modal para Añadir Clientes -->
+    <!-- Modal para el formulario de agregar nuevo cliente -->
     <div class="modal fade" id="addClientModal" tabindex="-1" aria-labelledby="addClientModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

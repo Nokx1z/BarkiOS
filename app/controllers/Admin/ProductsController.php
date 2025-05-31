@@ -79,10 +79,19 @@ class ProductsController {
 
     // ───── Métodos para añadir producto ─────
     private function handleAddProduct() {
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
         $required = ['id', 'nombre', 'tipo', 'categoria', 'precio'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
-                throw new Exception("El campo $field es requerido");
+                if ($isAjax) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'message' => "El campo $field es requerido"]);
+                    exit;
+                } else {
+                    header("Location: products-admin.php?error=campo_requerido");
+                    exit;
+                }
             }
         }
 
@@ -93,15 +102,30 @@ class ProductsController {
         $precio = (float)$_POST['precio'];
 
         if ($this->productModel->productExists($id)) {
-            header("Location: products-admin.php?error=id_duplicado&id=" . urlencode($id));
-            exit();
+            if ($isAjax) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => "Ya existe un producto con este ID"]);
+                exit;
+            } else {
+                header("Location: products-admin.php?error=id_duplicado&id=" . urlencode($id));
+                exit;
+            }
         }
 
         $success = $this->productModel->add($id, $nombre, $tipo, $categoria, $precio);
 
-        if ($success) {
-            header("Location: products-admin.php?success=add");
-            exit();
+        if ($isAjax) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => $success]);
+            exit;
+        } else {
+            if ($success) {
+                header("Location: products-admin.php?success=add");
+                exit;
+            } else {
+                header("Location: products-admin.php?error=add_failed");
+                exit;
+            }
         }
     }
 

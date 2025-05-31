@@ -490,34 +490,31 @@ document.addEventListener('DOMContentLoaded', function() {
     // Manejador para agregar producto
     function handleAddProduct(e) {
         e.preventDefault();
-        
+
         const form = e.target;
         const formData = new FormData(form);
         const submitButton = form.querySelector('button[type="submit"]');
         const spinner = submitButton ? submitButton.querySelector('.spinner-border') : null;
         const buttonText = submitButton ? submitButton.querySelector('.btn-text') : null;
-        
+
         // Validar formulario
         if (!validateForm(form)) {
             return false;
         }
-        
+
         // Mostrar spinner y deshabilitar botón
         if (submitButton) {
             submitButton.disabled = true;
             if (spinner) spinner.classList.remove('d-none');
             if (buttonText) buttonText.textContent = 'Guardando...';
         }
-        
+
         // Crear objeto con los datos del formulario
         const formDataObj = {};
         formData.forEach((value, key) => {
             formDataObj[key] = value;
         });
-        
-        // Enviar datos por AJAX
-        
-        //Toma el index
+
         fetch('index.php?controller=products&action=add_ajax', {
             method: 'POST',
             headers: {
@@ -527,66 +524,54 @@ document.addEventListener('DOMContentLoaded', function() {
             body: new URLSearchParams(formDataObj).toString(),
             credentials: 'same-origin'
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => {
-                    throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (!data) {
-                throw new Error('No se recibió una respuesta válida del servidor');
-            }
-            
-            // Cerrar el modal y limpiar
-            const modalElement = document.getElementById('addProductModal');
-            if (modalElement) {
-                const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-                modal.hide();
-                
-                // Limpiar el formulario
-                const form = document.getElementById('addProductForm');
-                if (form) form.reset();
-                
-                // Restablecer el botón
+        .then(async response => {
+            const contentType = response.headers.get("content-type");
+            const isJson = contentType && contentType.includes("application/json");
+            const data = isJson ? await response.json() : {};
+
+            if (!response.ok || data.success === false) {
+                // Mostrar mensaje de error sin lanzar excepción
+                const msg = data.message || `Error HTTP ${response.status}`;
+                showAlert(msg, 'danger');
+
                 if (submitButton) {
                     submitButton.disabled = false;
                     if (spinner) spinner.classList.add('d-none');
                     if (buttonText) buttonText.textContent = 'Guardar Producto';
                 }
-                
-                // Eliminar el backdrop manualmente si existe
-                const backdrop = document.querySelector('.modal-backdrop');
-                if (backdrop) {
-                    backdrop.remove();
-                }
-                
-                // Restaurar el scroll del body
-                document.body.style.overflow = 'auto';
-                document.body.style.paddingRight = '0';
+
+                throw new Error(msg); // Para que aparezca en consola, opcional
             }
-            
-            // Mostrar mensaje de éxito
-            showAlert('Producto agregado correctamente', 'success');
-            
-            // Recargar la lista de productos
-            loadProducts();
-        })
-        .catch(error => {
-            console.error('Error al agregar el producto:', error);
-            
-            // Mostrar mensaje de error
-            showAlert('Error al agregar el producto: ' + error.message, 'danger');
-            
-            // Restablecer el botón
+
+            // Éxito
+            const modalElement = document.getElementById('addProductModal');
+            if (modalElement) {
+                const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                modal.hide();
+            }
+
+            if (form) form.reset();
+
             if (submitButton) {
                 submitButton.disabled = false;
                 if (spinner) spinner.classList.add('d-none');
                 if (buttonText) buttonText.textContent = 'Guardar Producto';
             }
+
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.remove();
+
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = '0';
+
+            showAlert('Producto agregado correctamente', 'success');
+            loadProducts();
+        })
+        .catch(error => {
+            console.error('Error al agregar el producto:', error.message);
+            // Ya se mostró el mensaje, no es necesario repetir
         });
+
     }
     
     function loadProductForEdit(productId) {
