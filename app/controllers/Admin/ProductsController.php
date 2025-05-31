@@ -172,14 +172,15 @@ class ProductsController {
                     throw new Exception("El campo $field es requerido");
                 }
                 
-                // Sanitize input
+                
                 $data[$field] = $field === 'id' ? (int)$_POST[$field] : 
                               ($field === 'precio' ? (float)$_POST[$field] : 
                               htmlspecialchars(trim($_POST[$field])));
             }
+            $cedula = (int) $data['id'];
             
             // Check if product already exists
-            if ($this->productModel->productExists($data['id'])) {
+            if ($this->productModel->productExists($cedula)) {
                 throw new Exception("Ya existe un producto con este ID");
             }
             
