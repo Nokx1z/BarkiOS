@@ -516,6 +516,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Enviar datos por AJAX
+        
         //Toma el index
         fetch('index.php?controller=products&action=add_ajax', {
             method: 'POST',

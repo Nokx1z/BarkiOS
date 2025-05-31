@@ -34,7 +34,7 @@ class ProductsController {
                 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'get_products') {
                     $this->getProductsAjax();
                 } else {
-                    //throw new Exception('Acción no válida');
+                    //Si no hace una acción 
                     $this->index();
                 }
             } else {
@@ -47,15 +47,18 @@ class ProductsController {
                 }
             }
         } catch (Exception $e) {
-            // Clean any output buffer
+            // Limpia cualquier contenido que haya sido enviado al buffer de salida
             if (ob_get_length()) ob_clean();
             
             if ($isAjax) {
+                // Si la petición es AJAX, responde con un JSON y código HTTP 500 (error del servidor)
                 http_response_code(500);
                 header('Content-Type: application/json');
                 echo json_encode([
-                    'success' => false, 
+                    'success' => false,
+                     // Mensaje de error para el usuario 
                     'message' => 'Error en el servidor: ' . $e->getMessage(),
+                    // Información de depuración (archivo, línea y traza del error)
                     'debug' => [
                         'file' => $e->getFile(),
                         'line' => $e->getLine(),
@@ -63,7 +66,7 @@ class ProductsController {
                     ]
                 ]);
             } else {
-                // For non-AJAX requests, output the error
+                 // Si NO es una petición AJAX, muestra el error directamente y detiene la ejecución
                 die("Error: " . $e->getMessage());
             }
             exit();
@@ -74,10 +77,7 @@ class ProductsController {
         return $this->productModel->getAll();
     }
 
-    public function getProductById($id) {
-        return $this->productModel->getById($id);
-    }
-
+    // ───── Métodos para añadir producto ─────
     private function handleAddProduct() {
         $required = ['id', 'nombre', 'tipo', 'categoria', 'precio'];
         foreach ($required as $field) {
@@ -105,6 +105,7 @@ class ProductsController {
         }
     }
 
+    // ───── Métodos para editar producto ─────
     private function handleEditProduct() {
         $required = ['id', 'nombre', 'tipo', 'categoria', 'precio'];
         foreach ($required as $field) {
@@ -154,36 +155,36 @@ class ProductsController {
         $this->handleDeleteProductAjax();
     }
     // ───── Métodos AJAX ─────
-    // AJAX Handlers
+    // Maneja la petición AJAX para agregar un producto
     private function handleAddProductAjax() {
-        // Clear any previous output
+        // Limpia cualquier salida previa en el buffer para evitar mezclar datos
         if (ob_get_length()) ob_clean();
         
-        // Set JSON header
+        // Establece la cabecera para indicar que la respuesta será JSON
         header('Content-Type: application/json');
         
         try {
             $required = ['id', 'nombre', 'tipo', 'categoria', 'precio'];
             $data = [];
             
-            // Validate required fields
+            // Define los campos requeridos para agregar un producto
             foreach ($required as $field) {
                 if (!isset($_POST[$field]) || (is_string($_POST[$field]) && trim($_POST[$field]) === '')) {
                     throw new Exception("El campo $field es requerido");
                 }
                 
-                // Sanitize input
+            // Valida que todos los campos requeridos estén presentes y no vacíos
                 $data[$field] = $field === 'id' ? (int)$_POST[$field] : 
                               ($field === 'precio' ? (float)$_POST[$field] : 
                               htmlspecialchars(trim($_POST[$field])));
             }
             
-            // Check if product already exists
+            // Sanitiza y convierte los datos según el tipo de campo
             if ($this->productModel->productExists($data['id'])) {
                 throw new Exception("Ya existe un producto con este ID");
             }
             
-            // Add the product
+            // Intenta agregar el producto a la base de datos
             $success = $this->productModel->add(
                 $data['id'], 
                 $data['nombre'], 
@@ -191,29 +192,32 @@ class ProductsController {
                 $data['categoria'], 
                 $data['precio']
             );
-            
+            // Si la inserción falla, lanza una excepción            
             if (!$success) {
                 throw new Exception("Error al agregar el producto a la base de datos");
             }
             
-            // Get the newly added product
+            // Recupera el producto recién agregado para devolverlo en la respuesta
             $product = $this->productModel->getById($data['id']);
             
+            // Si no se puede recuperar el producto, lanza una excepción       
             if (!$product) {
                 throw new Exception("No se pudo recuperar el producto recién agregado");
             }
             
-            // Return success response
+            // Construye la respuesta de éxito
             $response = [
                 'success' => true, 
                 'message' => 'Producto agregado correctamente',
                 'product' => $product
             ];
             
+            // Devuelve la respuesta en formato JSON y termina la ejecución
             echo json_encode($response);
             exit();
             
         } catch (Exception $e) {
+            // Si ocurre un error, responde con código 400 y el mensaje de error
             http_response_code(400);
             $response = [
                 'success' => false,
@@ -263,27 +267,34 @@ class ProductsController {
     }
     
     private function handleDeleteProductAjax() {
-        // Clear any previous output
+        // Limpia cualquier salida previa en el buffer para evitar mezclar datos
         if (ob_get_length()) ob_clean();
         
-        // Set JSON header
+        // Establece la cabecera para indicar que la respuesta será JSON
         header('Content-Type: application/json');
         
         try {
+            // Verifica que se haya enviado un ID válido por POST
             if (!isset($_POST['id']) || !is_numeric($_POST['id'])) {
                 throw new Exception("ID de producto inválido");
             }
             
+            // Convierte el ID a entero
             $id = (int)$_POST['id'];
             
+            // Verifica que el producto exista antes de intentar eliminarlo
             if (!$this->productModel->productExists($id)) {
                 throw new Exception("El producto no existe");
             }
             
+            // (Opcional) Obtiene el producto antes de eliminarlo (no se usa en la respuesta)
             $product = $this->productModel->getById($id);
+
+            // Intenta eliminar el producto
             $success = $this->productModel->delete($id);
             
             if ($success) {
+                 // Si la eliminación fue exitosa, responde con éxito y el ID eliminado
                 $response = [
                     'success' => true, 
                     'message' => 'Producto eliminado correctamente',
@@ -293,9 +304,11 @@ class ProductsController {
                 echo json_encode($response);
                 exit();
             } else {
+                // Si falla la eliminación, lanza una excepción
                 throw new Exception("Error al eliminar el producto");
             }
         } catch (Exception $e) {
+            // Si ocurre un error, responde con código 500 y el mensaje de error
             http_response_code(500);
             $response = [
                 'success' => false,
@@ -389,9 +402,9 @@ class ProductsController {
 }
 
 $controller = new ProductsController();
+
 $controller->handleRequest();
 
 // Obtenemos los productos para la carga inicial
 $products = $controller->getProducts();
 // El controlador debe ser instanciado y ejecutado desde el archivo que lo requiera
-// Por ejemplo, desde products-admin.php
