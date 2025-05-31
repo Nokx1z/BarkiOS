@@ -134,7 +134,10 @@
                                 <option value="">Seleccione una categoría</option>
                                 <option value="Formal">Formal</option>
                                 <option value="Casual">Casual</option>
-                                <option value="Ujum">Ujum</option>
+                                <option value="Deportivo">Deportivo</option>
+                                <option value="Fiesta">Fiesta</option>
+                                <option value="Invierno">Invierno</option>
+                                <option value="Verano">Verano</option>
                             </select>
                             <div class="invalid-feedback">Por favor seleccione una categoría</div>
                         </div>
@@ -145,6 +148,10 @@
                                 <option value="vestidos">Vestidos</option>
                                 <option value="blusas">Blusas</option>
                                 <option value="pantalones">Pantalones</option>
+                                <option value="camisas">Camisas</option>
+                                <option value="faldas">Faldas</option>
+                                <option value="shorts">Shorts</option>
+                                <option value="conjuntos">Conjuntos</option>
                             </select>
                             <div class="invalid-feedback">Por favor seleccione un tipo de prenda</div>
                         </div>
@@ -206,20 +213,29 @@
                     <div class="mb-3">
                         <label class="form-label">Categoría</label>
                         <select class="form-select" name="categoria" id="editProductCategory" required>
+                            <!-- Opciones para Categoría -->
                             <option value="">Seleccione una categoría</option>
                             <option value="Formal">Formal</option>
                             <option value="Casual">Casual</option>
-                            <option value="Ujum">Ujum</option>
+                            <option value="Deportivo">Deportivo</option>
+                            <option value="Fiesta">Fiesta</option>
+                            <option value="Invierno">Invierno</option>
+                            <option value="Verano">Verano</option>
                         </select>
                         <div class="invalid-feedback">Por favor seleccione una categoría</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Tipo de prenda</label>
                         <select class="form-select" name="tipo" id="editProductType" required>
+                            <!-- Opciones para Tipo de prenda -->
                             <option value="">Seleccione un tipo</option>
                             <option value="vestidos">Vestidos</option>
                             <option value="blusas">Blusas</option>
                             <option value="pantalones">Pantalones</option>
+                            <option value="camisas">Camisas</option>
+                            <option value="faldas">Faldas</option>
+                            <option value="shorts">Shorts</option>
+                            <option value="conjuntos">Conjuntos</option>
                         </select>
                         <div class="invalid-feedback">Por favor seleccione un tipo de prenda</div>
                     </div>

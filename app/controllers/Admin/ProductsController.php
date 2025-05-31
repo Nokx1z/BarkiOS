@@ -1,30 +1,46 @@
 <?php
 namespace Barkios\controllers\Admin;
+
 use Barkios\models\Product;
 use Exception;
-//require_once __DIR__.'/../../models/Product.php';
 
+/**
+ * Controlador para la gestión de productos en el área de administración.
+ * Permite realizar operaciones CRUD sobre los productos, tanto mediante peticiones normales
+ * como a través de AJAX. Incluye manejo de errores y respuestas en formato JSON para AJAX.
+ */
 class ProductsController {
+    /** @var Product Instancia del modelo de productos */
     private $productModel;
-    // ───── Constructor ─────
+
+    /**
+     * Constructor de la clase.
+     * Inicializa el modelo de productos.
+     */
     public function __construct() {
         $this->productModel = new Product();
     }
-    // ───── Enrutador principal ─────
+
+    /**
+     * Enrutador principal del controlador.
+     * Detecta el tipo de petición (AJAX o normal) y la acción solicitada,
+     * luego llama al método correspondiente para manejar la acción.
+     * 
+     * @return void
+     */
     public function handleRequest() {
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
-        
+
         $action = $_GET['action'] ?? '';
-        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-                 strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-        
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
         ob_start();
-        
+
         try {
             if ($isAjax) {
                 header('Content-Type: application/json');
-                
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add_ajax') {
                     $this->handleAddProductAjax();
                 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit_ajax') {
@@ -34,7 +50,6 @@ class ProductsController {
                 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'get_products') {
                     $this->getProductsAjax();
                 } else {
-                    //Si no hace una acción 
                     $this->index();
                 }
             } else {
@@ -47,18 +62,15 @@ class ProductsController {
                 }
             }
         } catch (Exception $e) {
-            // Limpia cualquier contenido que haya sido enviado al buffer de salida
+            // Manejo global de errores para todas las acciones
             if (ob_get_length()) ob_clean();
-            
+
             if ($isAjax) {
-                // Si la petición es AJAX, responde con un JSON y código HTTP 500 (error del servidor)
                 http_response_code(500);
                 header('Content-Type: application/json');
                 echo json_encode([
                     'success' => false,
-                     // Mensaje de error para el usuario 
                     'message' => 'Error en el servidor: ' . $e->getMessage(),
-                    // Información de depuración (archivo, línea y traza del error)
                     'debug' => [
                         'file' => $e->getFile(),
                         'line' => $e->getLine(),
@@ -66,18 +78,28 @@ class ProductsController {
                     ]
                 ]);
             } else {
-                 // Si NO es una petición AJAX, muestra el error directamente y detiene la ejecución
                 die("Error: " . $e->getMessage());
             }
             exit();
         }
     }
-    // ───── Métodos de Productos (NO AJAX) ─────
+
+    /**
+     * Obtiene todos los productos registrados.
+     * 
+     * @return array Lista de productos.
+     */
     public function getProducts() {
         return $this->productModel->getAll();
     }
 
-    // ───── Métodos para añadir producto ─────
+    /**
+     * Maneja la adición de un nuevo producto (petición normal).
+     * Valida los datos recibidos, verifica duplicados y agrega el producto.
+     * Responde en JSON si es AJAX, o redirige en caso contrario.
+     * 
+     * @return void
+     */
     private function handleAddProduct() {
         $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
@@ -129,7 +151,13 @@ class ProductsController {
         }
     }
 
-    // ───── Métodos para editar producto ─────
+    /**
+     * Maneja la edición de un producto existente (petición normal).
+     * Valida los datos recibidos, verifica existencia y actualiza el producto.
+     * Redirige según el resultado.
+     * 
+     * @return void
+     */
     private function handleEditProduct() {
         $required = ['id', 'nombre', 'tipo', 'categoria', 'precio'];
         foreach ($required as $field) {
@@ -157,6 +185,13 @@ class ProductsController {
         }
     }
 
+    /**
+     * Maneja la eliminación de un producto (petición normal).
+     * Valida el ID recibido y elimina el producto si existe.
+     * Redirige según el resultado.
+     * 
+     * @return void
+     */
     private function handleDeleteProduct() {
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             throw new Exception("ID de producto inválido");
@@ -169,101 +204,107 @@ class ProductsController {
             exit();
         }
     }
-    
-    //Este metodo es el que me permite cargar el ajax desde la vista 
+
+    /**
+     * Punto de entrada para agregar productos vía AJAX.
+     * Llama internamente al método privado que maneja la lógica.
+     * 
+     * @return void
+     */
     public function add_ajax() {
         $this->handleAddProductAjax();
     }
 
-    public function  delete_ajax(){
+    /**
+     * Punto de entrada para eliminar productos vía AJAX.
+     * Llama internamente al método privado que maneja la lógica.
+     * 
+     * @return void
+     */
+    public function delete_ajax() {
         $this->handleDeleteProductAjax();
     }
-    // ───── Métodos AJAX ─────
-    // Maneja la petición AJAX para agregar un producto
+
+    /**
+     * Maneja la adición de un nuevo producto vía AJAX.
+     * Valida y sanitiza los datos recibidos, verifica duplicados y agrega el producto.
+     * Devuelve una respuesta JSON con el resultado.
+     * 
+     * @return void
+     */
     private function handleAddProductAjax() {
-        // Limpia cualquier salida previa en el buffer para evitar mezclar datos
         if (ob_get_length()) ob_clean();
-        
-        // Establece la cabecera para indicar que la respuesta será JSON
         header('Content-Type: application/json');
-        
+
         try {
             $required = ['id', 'nombre', 'tipo', 'categoria', 'precio'];
             $data = [];
-            
-            // Define los campos requeridos para agregar un producto
             foreach ($required as $field) {
                 if (!isset($_POST[$field]) || (is_string($_POST[$field]) && trim($_POST[$field]) === '')) {
                     throw new Exception("El campo $field es requerido");
                 }
-                
-            // Valida que todos los campos requeridos estén presentes y no vacíos
-                $data[$field] = $field === 'id' ? (int)$_POST[$field] : 
-                              ($field === 'precio' ? (float)$_POST[$field] : 
+                $data[$field] = $field === 'id' ? (int)$_POST[$field] :
+                              ($field === 'precio' ? (float)$_POST[$field] :
                               htmlspecialchars(trim($_POST[$field])));
             }
-            $cedula = (int) $data['id'];
-            
-            // Sanitiza y convierte los datos según el tipo de campo
+
             if ($this->productModel->productExists($data['id'])) {
                 throw new Exception("Ya existe un producto con este ID");
             }
-            
-            // Intenta agregar el producto a la base de datos
+
             $success = $this->productModel->add(
-                $data['id'], 
-                $data['nombre'], 
-                $data['tipo'], 
-                $data['categoria'], 
+                $data['id'],
+                $data['nombre'],
+                $data['tipo'],
+                $data['categoria'],
                 $data['precio']
             );
-            // Si la inserción falla, lanza una excepción            
+
             if (!$success) {
                 throw new Exception("Error al agregar el producto a la base de datos");
             }
-            
-            // Recupera el producto recién agregado para devolverlo en la respuesta
+
             $product = $this->productModel->getById($data['id']);
-            
-            // Si no se puede recuperar el producto, lanza una excepción       
             if (!$product) {
                 throw new Exception("No se pudo recuperar el producto recién agregado");
             }
-            
-            // Construye la respuesta de éxito
+
             $response = [
-                'success' => true, 
+                'success' => true,
                 'message' => 'Producto agregado correctamente',
                 'product' => $product
             ];
-            
-            // Devuelve la respuesta en formato JSON y termina la ejecución
+
             echo json_encode($response);
             exit();
-            
+
         } catch (Exception $e) {
-            // Si ocurre un error, responde con código 400 y el mensaje de error
             http_response_code(400);
             $response = [
                 'success' => false,
                 'message' => $e->getMessage()
             ];
-            
             echo json_encode($response);
             exit();
         }
     }
-    
+
+    /**
+     * Maneja la edición de un producto vía AJAX.
+     * Valida y sanitiza los datos recibidos, verifica existencia y actualiza el producto.
+     * Devuelve una respuesta JSON con el resultado.
+     * 
+     * @return void
+     */
     private function handleEditProductAjax() {
         $required = ['id', 'nombre', 'tipo', 'categoria', 'precio'];
         $data = [];
-        
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
                 throw new Exception("El campo $field es requerido");
             }
-            $data[$field] = $field === 'id' ? (int)$_POST[$field] : 
-                          ($field === 'precio' ? (float)$_POST[$field] : 
+            $data[$field] = $field === 'id' ? (int)$_POST[$field] :
+                          ($field === 'precio' ? (float)$_POST[$field] :
                           htmlspecialchars(trim($_POST[$field])));
         }
 
@@ -272,17 +313,17 @@ class ProductsController {
         }
 
         $success = $this->productModel->update(
-            $data['id'], 
-            $data['nombre'], 
-            $data['tipo'], 
-            $data['categoria'], 
+            $data['id'],
+            $data['nombre'],
+            $data['tipo'],
+            $data['categoria'],
             $data['precio']
         );
 
         if ($success) {
             $product = $this->productModel->getById($data['id']);
             echo json_encode([
-                'success' => true, 
+                'success' => true,
                 'message' => 'Producto actualizado correctamente',
                 'product' => $product
             ]);
@@ -290,118 +331,106 @@ class ProductsController {
             throw new Exception("Error al actualizar el producto");
         }
     }
-    
+
+    /**
+     * Maneja la eliminación de un producto vía AJAX.
+     * Valida el ID recibido, verifica existencia y elimina el producto.
+     * Devuelve una respuesta JSON con el resultado.
+     * 
+     * @return void
+     */
     private function handleDeleteProductAjax() {
-        // Limpia cualquier salida previa en el buffer para evitar mezclar datos
         if (ob_get_length()) ob_clean();
-        
-        // Establece la cabecera para indicar que la respuesta será JSON
         header('Content-Type: application/json');
-        
+
         try {
-            // Verifica que se haya enviado un ID válido por POST
             if (!isset($_POST['id']) || !is_numeric($_POST['id'])) {
                 throw new Exception("ID de producto inválido");
             }
-            
-            // Convierte el ID a entero
+
             $id = (int)$_POST['id'];
-            
-            // Verifica que el producto exista antes de intentar eliminarlo
+
             if (!$this->productModel->productExists($id)) {
                 throw new Exception("El producto no existe");
             }
-            
-            // (Opcional) Obtiene el producto antes de eliminarlo (no se usa en la respuesta)
-            $product = $this->productModel->getById($id);
 
-            // Intenta eliminar el producto
             $success = $this->productModel->delete($id);
-            
+
             if ($success) {
-                 // Si la eliminación fue exitosa, responde con éxito y el ID eliminado
                 $response = [
-                    'success' => true, 
+                    'success' => true,
                     'message' => 'Producto eliminado correctamente',
                     'productId' => $id
                 ];
-                
                 echo json_encode($response);
                 exit();
             } else {
-                // Si falla la eliminación, lanza una excepción
                 throw new Exception("Error al eliminar el producto");
             }
         } catch (Exception $e) {
-            // Si ocurre un error, responde con código 500 y el mensaje de error
             http_response_code(500);
             $response = [
                 'success' => false,
                 'message' => $e->getMessage()
             ];
-            
             echo json_encode($response);
             exit();
         }
     }
 
-    // ───── Utilidades ─────
+    /**
+     * Devuelve la lista de productos o un producto específico en formato JSON para AJAX.
+     * Si se recibe un ID por GET, devuelve solo ese producto. Si no, devuelve todos.
+     * Incluye manejo de errores y logging.
+     * 
+     * @return void
+     */
     private function getProductsAjax() {
-        // Limpiar cualquier salida previa
         while (ob_get_level()) ob_end_clean();
-        
-        // Establecer cabeceras para JSON
         header('Content-Type: application/json; charset=utf-8');
-        
+
         try {
-            // Registrar la solicitud
             error_log('[' . date('Y-m-d H:i:s') . '] getProductsAjax - Iniciando...');
-            
-            // Verificar si se solicitó un ID de producto específico
+
             if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                 $productId = (int)$_GET['id'];
                 error_log('[' . date('Y-m-d H:i:s') . '] getProductsAjax - Solicitando producto ID: ' . $productId);
-                
+
                 $product = $this->productModel->getById($productId);
-                
+
                 if (!$product) {
                     throw new Exception('El producto solicitado no existe');
                 }
-                
+
                 $response = [
                     'success' => true,
-                    'products' => [$product] // Devolver como array para consistencia
+                    'products' => [$product]
                 ];
-                
+
                 error_log('[' . date('Y-m-d H:i:s') . '] getProductsAjax - Producto encontrado: ' . json_encode($product));
             } else {
-                // Obtener todos los productos si no se especifica un ID
                 error_log('[' . date('Y-m-d H:i:s') . '] getProductsAjax - Solicitando todos los productos');
-                
+
                 $products = $this->productModel->getAll();
                 error_log('[' . date('Y-m-d H:i:s') . '] getProductsAjax - Productos encontrados: ' . count($products));
-                
+
                 $response = [
                     'success' => true,
                     'products' => $products,
                     'count' => count($products)
                 ];
-                
+
                 error_log('[' . date('Y-m-d H:i:s') . '] getProductsAjax - Total de productos: ' . count($products));
             }
-            
-            // Enviar la respuesta
+
             echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            
+
         } catch (Exception $e) {
-            // Registrar el error
             error_log('[' . date('Y-m-d H:i:s') . '] getProductsAjax - ERROR: ' . $e->getMessage());
             error_log('[' . date('Y-m-d H:i:s') . '] getProductsAjax - Archivo: ' . $e->getFile() . ' Línea: ' . $e->getLine());
-            
-            // Configurar código de estado HTTP
+
             http_response_code(500);
-            
-            // Crear respuesta de error
+
             $response = [
                 'success' => false,
                 'message' => 'Error al obtener los productos: ' . $e->getMessage(),
@@ -411,23 +440,26 @@ class ProductsController {
                     'params' => $_GET
                 ]
             ];
-            
-            // Enviar respuesta de error
+
             echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
-        
-        // Asegurarse de que no se envíe nada más
         exit();
     }
-    
+
+    /**
+     * Muestra la vista principal de administración de productos.
+     * Obtiene la lista de productos y carga la vista correspondiente.
+     * 
+     * @return void
+     */
     public function index() {
         $products = $this->getProducts();
         require __DIR__ . '/../../views/admin/products-admin.php';
     }
 }
 
+// Inicialización del controlador y manejo de la solicitud
 $controller = new ProductsController();
-
 $controller->handleRequest();
 
 // Obtenemos los productos para la carga inicial
