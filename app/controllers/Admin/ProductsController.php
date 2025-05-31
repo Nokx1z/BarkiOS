@@ -197,24 +197,15 @@ class ProductsController {
                     throw new Exception("El campo $field es requerido");
                 }
                 
-<<<<<<< HEAD
-                
-=======
             // Valida que todos los campos requeridos estén presentes y no vacíos
->>>>>>> 843b0adaefa3c766ca7189cd7eb045b4dd642ba8
                 $data[$field] = $field === 'id' ? (int)$_POST[$field] : 
                               ($field === 'precio' ? (float)$_POST[$field] : 
                               htmlspecialchars(trim($_POST[$field])));
             }
             $cedula = (int) $data['id'];
             
-<<<<<<< HEAD
-            // Check if product already exists
-            if ($this->productModel->productExists($cedula)) {
-=======
             // Sanitiza y convierte los datos según el tipo de campo
             if ($this->productModel->productExists($data['id'])) {
->>>>>>> 843b0adaefa3c766ca7189cd7eb045b4dd642ba8
                 throw new Exception("Ya existe un producto con este ID");
             }
             

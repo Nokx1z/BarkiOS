@@ -18,6 +18,7 @@
 </head>
 <body>
 
+    <!-- Barra lateral de navegación -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-sticky">
             <div class="sidebar-header">
@@ -53,7 +54,7 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Contenido principal -->
     <div class="main-content">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -63,19 +64,21 @@
                 <i class="fas fa-plus me-1"></i> Agregar proveedor
             </button>
             
-            <!-- Mensajes de éxito/error -->
+            <!-- Contenedor para mensajes de éxito/error -->
             <div id="message-container" class="mt-3"></div>
 
-            <!-- Tabla de Supplieros -->
+            <!-- Tabla de proveedores -->
             <div class="card mt-3">
                 <div class="card-body p-0">
                     <div class="table-responsive">
+                        <!-- Spinner de carga mientras se obtienen los datos -->
                         <div id="table-loading" class="text-center py-5">
                             <div class="spinner-border text-primary" role="status">
                                 <span class="visually-hidden">Cargando...</span>
                             </div>
                             <p class="mt-2 text-muted">Cargando proveedores...</p>
                         </div>
+                        <!-- Tabla de proveedores (rellenada por PHP y AJAX) -->
                         <table class="table table-hover align-middle text-center d-none" id="suppliers-table">
                             <thead class="table-light">
                                 <tr>
@@ -87,6 +90,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <!-- Renderizado inicial por PHP -->
                                 <?php if (!empty($supplier)): ?>
                                     <?php foreach ($supplier as $supplier): ?>
                                         <tr>
@@ -95,6 +99,7 @@
                                             <td><?= htmlspecialchars($supplier['nombre_empresa'] ?? '') ?></td>
                                             <td><?= htmlspecialchars($supplier['direccion'] ?? '') ?></td>
                                             <td>
+                                                <!-- Botón para eliminar proveedor -->
                                                 <button class="btn btn-sm btn-outline-danger delete-supplier" 
                                                         data-id="<?= $supplier['id'] ?>"
                                                         data-nombre="<?= htmlspecialchars($supplier['nombre_contacto']) ?>">
@@ -118,7 +123,7 @@
         </div>
     </div>
 
-    <!-- Modal para Añadir Proveedor -->
+    <!-- Modal para añadir proveedor -->
     <div class="modal fade" id="addSupplierModal" tabindex="-1" aria-labelledby="addSupplierModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -126,8 +131,10 @@
                     <h5 class="modal-title" id="addSupplierModalLabel">Añadir Nuevo Proveedor</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <!-- Formulario para agregar proveedor -->
                 <form id="addSupplierForm">
                     <div class="modal-body">
+                        <!-- Campos del formulario: nombre, empresa, rif, tipo rif, dirección -->
                         <div class="mb-3">
                             <label class="form-label">Nombre del Proveedor</label>
                             <input type="text" class="form-control" 
@@ -175,7 +182,7 @@
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Scripts para AJAX, Bootstrap y SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

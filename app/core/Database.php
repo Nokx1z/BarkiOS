@@ -3,10 +3,19 @@ namespace Barkios\core;
 use PDO;
 use PDOException;
 
+/**
+ * Clase Database
+ * Implementa el patrón Singleton para la conexión PDO a la base de datos.
+ */
 class Database {
+    /** @var Database Instancia única de la clase */
     private static $instance = null;
+    /** @var PDO Conexión PDO */
     private $pdo;
 
+    /**
+     * Constructor privado: inicializa la conexión PDO.
+     */
     private function __construct() {
         try {
             $this->pdo = new PDO(
@@ -19,10 +28,15 @@ class Database {
                 ]
             );
         } catch (PDOException $e) {
+            // Manejo de error de conexión
             die("Error de conexión: " . $e->getMessage());
         }
     }
 
+    /**
+     * Devuelve la instancia única de Database.
+     * @return Database
+     */
     public static function getInstance() {
         if (self::$instance === null) {
             self::$instance = new Database();
@@ -30,7 +44,10 @@ class Database {
         return self::$instance;
     }
 
-    // Método para obtener la conexión PDO directamente
+    /**
+     * Devuelve la conexión PDO.
+     * @return PDO
+     */
     public function getConnection() {
         return $this->pdo;
     }

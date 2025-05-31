@@ -2,17 +2,28 @@
 namespace Barkios\controllers\Admin;
 use Barkios\models\Supplier;
 use Exception;
-//require_once __DIR__.'/../../models/Supplier.php';
 
+/**
+ * Controlador de administración de proveedores.
+ * Gestiona las operaciones CRUD y AJAX para la entidad Supplier.
+ */
 class SupplierController {
+    /** @var Supplier Modelo de proveedor */
     private $supplierModel;
 
+    /**
+     * Constructor: inicializa el modelo de proveedor.
+     */
     public function __construct() {
         $this->supplierModel = new Supplier();
     }
 
+    /**
+     * Maneja la solicitud entrante (AJAX o página regular).
+     * Determina la acción a ejecutar según los parámetros y el método HTTP.
+     */
     public function handleRequest() {
-        // Habilitar reporte de errores
+        // Habilita el reporte de errores para depuración
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
         
@@ -20,14 +31,13 @@ class SupplierController {
         $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
         
-        // Registrar la solicitud
+        // Log de la solicitud recibida
         error_log("Solicitud recibida - Acción: $action, Método: " . $_SERVER['REQUEST_METHOD'] . ", AJAX: " . ($isAjax ? 'Sí' : 'No'));
         
         try {
-            // Manejar solicitudes AJAX
+            // Solicitudes AJAX
             if ($isAjax) {
                 header('Content-Type: application/json');
-                
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add_ajax') {
                     error_log("Invocando handleAddSupplierAjax");
                     $this->handleAddSupplierAjax();
@@ -42,7 +52,7 @@ class SupplierController {
                     throw new Exception('Acción no válida');
                 }
             } else {
-                // Manejar solicitudes de página regulares
+                // Solicitudes de página normales
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
                     $this->handleAddSupplier();
                 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'delete') {
@@ -50,6 +60,7 @@ class SupplierController {
                 }
             }
         } catch (Exception $e) {
+            // Manejo de errores global
             $errorMsg = 'Error en handleRequest: ' . $e->getMessage() . ' en ' . $e->getFile() . ':' . $e->getLine();
             error_log($errorMsg);
             
@@ -71,10 +82,19 @@ class SupplierController {
         }
     }
 
+    /**
+     * Devuelve todos los proveedores (para uso interno y vistas).
+     * @return array
+     */
     public function getSupplierr() {
         return $this->supplierModel->getAll();
     }
 
+    /**
+     * Maneja la adición de un proveedor desde formulario regular.
+     * Redirige según éxito o error.
+     * @throws Exception Si falta algún campo o hay duplicado.
+     */
     private function handleAddSupplier() {
         $required = ['id', 'nombre_contacto', 'nombre_empresa', 'direccion', 'tipo_rif'];
         foreach ($required as $field) {
@@ -89,13 +109,13 @@ class SupplierController {
         $direccion = htmlspecialchars(trim($_POST['direccion']));
         $tipo_rif = htmlspecialchars(trim($_POST['tipo_rif']));
 
-        // Verifica si ya existe antes de insertar
+        // Verifica duplicados
         if ($this->supplierModel->supplierExists($rif)) {
             header("Location: supplier-admin.php?error=rif_duplicado&rif=" . urlencode($rif));
             exit();
         }
 
-        // Si no existe, lo insertas
+        // Inserta proveedor
         $success = $this->supplierModel->add($rif, $nombre_contacto, $nombre_empresa, $direccion, $tipo_rif);
 
         if ($success) {
@@ -104,6 +124,10 @@ class SupplierController {
         }
     }
 
+    /**
+     * Maneja la eliminación de un proveedor por GET.
+     * @throws Exception Si el ID es inválido.
+     */
     private function handleDeleteSupplier() {
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             throw new Exception("ID de producto inválido");
@@ -112,19 +136,29 @@ class SupplierController {
         $success = $this->supplierModel->delete((int)$_GET['id']);
 
         if ($success) {
-        header('Location: supplier-admin.php?success=delete');
+            header('Location: supplier-admin.php?success=delete');
             exit();
         }
     }
 
+    /**
+     * Alias público para agregar proveedor vía AJAX.
+     */
     public function add_ajax() {
         $this->handleAddSupplierAjax();
     }
 
+    /**
+     * Alias público para eliminar proveedor vía AJAX.
+     */
     public function  delete_ajax(){
         $this->handleDeleteSupplierAjax();
     }
 
+    /**
+     * Maneja la adición de proveedor vía AJAX.
+     * Valida campos y responde en JSON.
+     */
     private function handleAddSupplierAjax() {
         try {
             $required = ['id', 'nombre_contacto', 'nombre_empresa', 'direccion', 'tipo_rif'];
@@ -144,12 +178,12 @@ class SupplierController {
                 throw new Exception("El RIF debe tener exactamente 9 dígitos");
             }
             
-            // Verificar si el proveedor ya existe
+            // Verificar duplicado
             if ($this->supplierModel->supplierExists($rif)) {
                 throw new Exception('El RIF ingresado ya está registrado.');
             }
 
-            // Agregar el proveedor
+            // Agregar proveedor
             $result = $this->supplierModel->add(
                 $rif,
                 $data['nombre_contacto'],
@@ -177,6 +211,10 @@ class SupplierController {
         exit();
     }
 
+    /**
+     * Maneja la eliminación de proveedor vía AJAX.
+     * Valida existencia y responde en JSON.
+     */
     private function handleDeleteSupplierAjax() {
         try {
             if (!isset($_POST['id']) || !is_numeric($_POST['id'])) {
@@ -185,7 +223,7 @@ class SupplierController {
 
             $id = (int)$_POST['id'];
             
-            // Verificar si el proveedor existe antes de intentar eliminarlo
+            // Verificar existencia
             if (!$this->supplierModel->supplierExists($id)) {
                 throw new Exception('El proveedor que intentas eliminar no existe');
             }
@@ -211,6 +249,9 @@ class SupplierController {
         exit();
     }
 
+    /**
+     * Devuelve todos los proveedores en formato JSON (AJAX).
+     */
     private function getSuppliersAjax() {
         try {
             $suppliers = $this->supplierModel->getAll();
@@ -228,17 +269,20 @@ class SupplierController {
         exit();
     }
 
-public function index() {
+    /**
+     * Acción principal: muestra la vista de administración de proveedores.
+     */
+    public function index() {
         $supplier = $this->getSupplierr();
         require __DIR__ . '/../../Views/Admin/supplier-admin.php';
     }
 }
 
-// Initialize the controller and handle the request
+// Inicializa el controlador y maneja la solicitud
 $controller = new SupplierController();
 $controller->handleRequest();
 
-// Only set $supplierr if this is a regular page load (not AJAX)
+// Solo para carga regular de página, define $supplierr para la vista
 if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || 
     strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
     $supplierr = $controller->getSupplierr();

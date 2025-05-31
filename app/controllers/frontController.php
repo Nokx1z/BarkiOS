@@ -1,23 +1,40 @@
 <?php
 namespace Barkios\controllers;
+
+/**
+ * FrontController
+ * Punto de entrada principal para el ruteo de la aplicación.
+ * Analiza la URL, determina el controlador y la acción a ejecutar,
+ * y maneja la carga dinámica de controladores y métodos.
+ */
 class FrontController {
+    /** @var string Nombre del controlador */
     private $controller;
+    /** @var string Nombre de la acción */
     private $action;
+    /** @var array Parámetros adicionales */
     private $params = [];
 
+    /**
+     * Constructor: analiza la URL y carga el controlador correspondiente.
+     */
     public function __construct() {
         $this->parseUrl();
         $this->loadController();
     }
 
+    /**
+     * Analiza la URL para determinar controlador, acción y parámetros.
+     * Soporta rutas amigables y parámetros GET.
+     */
     private function parseUrl() {
         if (isset($_GET['controller']) && isset($_GET['action'])) {
             $this->controller = $this->sanitize($_GET['controller']);
             $this->action = $this->sanitize($_GET['action']);
-            // Opcional params de GET
+            // Parámetros opcionales por GET
             $this->params = $_GET['params'] ?? [];
         } else {
-            // Tu código actual para leer segmentos
+            // Analiza la URI para rutas amigables
             $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
             $scriptName = $_SERVER['SCRIPT_NAME'];
 
@@ -27,6 +44,7 @@ class FrontController {
 
             $segments = array_filter(explode('/', $path));
 
+            // Si la ruta inicia con 'admin', la elimina
             if (isset($segments[0]) && strtolower($segments[0]) === 'admin') {
                 array_shift($segments);
             }
@@ -37,12 +55,19 @@ class FrontController {
         }
     }
 
-
-
+    /**
+     * Sanitiza el nombre de controlador o acción para evitar inyección.
+     * @param string $input
+     * @return string
+     */
     private function sanitize($input) {
         return preg_replace('/[^a-zA-Z0-9_]/', '', $input);
     }
 
+    /**
+     * Carga el archivo y la clase del controlador, y ejecuta la acción.
+     * Maneja errores de controlador o acción inexistentes.
+     */
     private function loadController() {
         $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
                 strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
@@ -50,6 +75,7 @@ class FrontController {
         $controllerName = ucfirst($this->controller) . 'Controller';
         $controllerFile = __DIR__ . '/Admin/' . $controllerName . '.php';
 
+        // Verifica existencia del archivo controlador
         if (!file_exists($controllerFile)) {
             if ($isAjax) {
                 http_response_code(404);
@@ -67,6 +93,7 @@ class FrontController {
         require_once $controllerFile;
         $fullClassName = 'Barkios\\controllers\\Admin\\' . $controllerName;
 
+        // Verifica existencia de la clase
         if (!class_exists($fullClassName)) {
             if ($isAjax) {
                 http_response_code(500);
@@ -83,6 +110,7 @@ class FrontController {
 
         $controller = new $fullClassName();
 
+        // Verifica existencia del método (acción)
         if (!method_exists($controller, $this->action)) {
             if ($isAjax) {
                 http_response_code(404);
@@ -97,7 +125,7 @@ class FrontController {
             }
         }
 
+        // Ejecuta la acción con los parámetros
         call_user_func_array([$controller, $this->action], $this->params);
     }
-
 }
