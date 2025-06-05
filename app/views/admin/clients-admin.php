@@ -7,64 +7,10 @@
  * y eliminar los clientes existentes.
  */
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <!-- Metadatos y enlaces a recursos externos -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clientes - Garage Barki</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="/assets/icons/Logo - Garage Barki.webp" type="image/x-icon">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="../../../public/assets/css/admin-styles.css">
-    <link rel="shortcut icon" href="../../../public/assets/icons/Logo - Garage Barki.webp" type="image/x-icon">
-</head>
-<body>
-
-    <!-- Barra lateral de navegación -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-sticky">
-            <div class="sidebar-header">
-                <h3>GARAGE<span>BARKI</span></h3>
-                <p class="mb-0">Panel de Administración</p>
-            </div>
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link" href="/app/admin/products/">
-                        <i class="fas fa-tachometer-alt"></i>
-                        Inicio
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/app/admin/products/">
-                        <i class="fas fa-tshirt"></i>
-                        Productos
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/app/admin/supplier/">
-                        <i class="fas fa-shopping-cart"></i>
-                        Proveedores
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/app/admin/clients/">
-                        <i class="fas fa-users"></i>
-                        Clientes
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-
+<?= require_once __DIR__ . '/../partials/header-admin.php'; ?>
+<!-- Barra lateral de navegación -->
+<?= require_once __DIR__ . '/../partials/navbar-admin.php'; ?>  
+   
     <!-- Contenido principal de la página -->
     <div class="main-content">
         <div class="container-fluid">
