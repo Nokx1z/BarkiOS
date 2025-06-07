@@ -6,13 +6,13 @@
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="/app/admin/products/">
+                    <a class="nav-link" href="/admin/products/">
                         <i class="fas fa-tachometer-alt"></i>
                         Inicio
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/app/admin/products/">
+                    <a class="nav-link" href="/admin/products/">
                         <i class="fas fa-tshirt"></i>
                         Productos
                     </a>
