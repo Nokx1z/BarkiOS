@@ -6,6 +6,12 @@
  * Incluye un formulario para agregar nuevos clientes y una tabla para visualizar
  * y eliminar los clientes existentes.
  */
+
+// Asegurarse de que $clientss esté definido
+if (!isset($clientss)) {
+    $clientsModel = new \Barkios\models\Clients();
+    $clientss = $clientsModel->getAll();
+}
 ?>
 <?= require_once __DIR__ . '/../partials/header-admin.php'; ?>
 <!-- Barra lateral de navegación -->
