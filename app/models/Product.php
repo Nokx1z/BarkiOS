@@ -1,6 +1,5 @@
 <?php
 namespace Barkios\models;
-
 use Barkios\core\Database;
 use PDO;
 use Exception;
@@ -13,15 +12,6 @@ use PDOException;
  * incluyendo operaciones CRUD y utilidades de consulta.
  */
 class Product extends Database{
-    private static $instance = null;
-
-    public static function getInstance()
-    {
-        if (self::$instance === null) {
-            self::$instance = new self(); // Instancia de Product, no de Database
-        }
-        return self::$instance;
-    }
     /**
      * Obtiene todos los productos registrados en la base de datos.
      * 

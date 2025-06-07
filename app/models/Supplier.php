@@ -10,16 +10,6 @@ use PDOException;
  * Encapsula la lógica de acceso a datos para la entidad Proveedor.
  */
 class Supplier extends Database{
-    private static $instance = null;
-
-    public static function getInstance()
-    {
-        if (self::$instance === null) {
-            self::$instance = new self(); // Instancia de Product, no de Database
-        }
-        return self::$instance;
-    }
-
     /**
      * Obtiene todos los proveedores de la base de datos.
      * @return array Lista de proveedores.

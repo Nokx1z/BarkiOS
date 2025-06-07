@@ -3,12 +3,11 @@ namespace Barkios\core;
 use PDO;
 use PDOException;
 
-abstract class Database {
+abstract class Database extends PDO{
 
-    private static $instance = null;
     protected $db;
 
-    protected function __construct() {
+    public function __construct() {
         try {
             $this->db = new PDO(
                 'mysql:host=barkios-db;dbname=barkios_db;charset=utf8',
@@ -23,12 +22,5 @@ abstract class Database {
 
             die("Error de conexión: " . $e->getMessage());
         }
-    }
-
-    abstract public static function getInstance();
-
-
-    public function getConnection() {
-        return $this->db;
     }
 }

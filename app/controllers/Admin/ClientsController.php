@@ -1,6 +1,6 @@
 <?php
 use Barkios\models\Clients;
-$clientsModel = Clients::getInstance();
+$clientsModel = new Clients();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -17,7 +17,7 @@ handleRequest($clientsModel);
  * Muestra la vista principal de administración de clientes
  */
 function index() {
-        $clientsModel = \Barkios\models\Clients::getInstance();
+        $clientsModel = new Clients();
         $clientss = $clientsModel->getAll(); // Cambia getAll() por el método real si es diferente
     require __DIR__ . '/../../views/admin/clients-admin.php';
 }

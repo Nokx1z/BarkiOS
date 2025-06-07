@@ -1,6 +1,6 @@
 <?php
 use Barkios\models\Supplier;
-$supplierModel = Supplier::getInstance();
+$supplierModel = New Supplier();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 

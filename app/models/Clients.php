@@ -12,16 +12,6 @@ use Exception;
  */
 
 class Clients extends Database{
-    private static $instance = null;
-
-    public static function getInstance()
-    {
-        if (self::$instance === null) {
-            self::$instance = new self(); // Instancia de Product, no de Database
-        }
-        return self::$instance;
-    }
-
     /**
      * Obtiene todos los clientes de la base de datos
      * 
