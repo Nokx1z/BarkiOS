@@ -6,21 +6,36 @@ ini_set('display_errors', 1);
 
 handleRequest($productModel);
 /**
- * Acción principal: muestra la vista de administración de productos.
+ * index
+ * 
+ * Acción principal.
+ * Muestra la vista de administración de productos.
+ * 
+ * Palabras clave: vista, administración, productos.
+ * 
+ * @return void
  */
-
 function index() {
     require __DIR__ . '/../../views/admin/products-admin.php';
 }
 
-
-
+/**
+ * handleRequest
+ * 
+ * Enrutador principal de solicitudes.
+ * Determina el tipo de solicitud (AJAX o normal) y la acción a ejecutar.
+ * 
+ * Palabras clave: enrutamiento, AJAX, POST, GET, acción, logging, manejo de errores.
+ * 
+ * @param Product $productModel Instancia del modelo de productos.
+ * @return void
+ */
 function handleRequest($productModel) {
     $action = $_GET['action'] ?? '';
     $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
             strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     
-    // Log de la solicitud recibida
+    // Logging de la solicitud recibida
     error_log("Solicitud recibida - Acción: $action, Método: " . $_SERVER['REQUEST_METHOD'] . ", AJAX: " . ($isAjax ? 'Sí' : 'No'));
     
     try {
@@ -39,7 +54,7 @@ function handleRequest($productModel) {
                 index();
             }
         } else {
-            // Solicitudes de página normales
+            // Solicitudes normales (no AJAX)
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
                 handleAddProduct($productModel);
             } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit') {
@@ -49,7 +64,7 @@ function handleRequest($productModel) {
             }
         }
     } catch (Exception $e) {
-        // Manejo global de errores para todas las acciones
+        // Manejo global de errores
         if (ob_get_length()) ob_clean();
 
         if ($isAjax) {
@@ -67,7 +82,7 @@ function handleRequest($productModel) {
         } else {
             die("Error: " . $e->getMessage());
         }
-            exit();
+        exit();
     }
 }
 
@@ -163,26 +178,6 @@ function handleEditProduct($productModel) {
     }
         exit;
 }
-/**
-* Punto de entrada para agregar productos vía AJAX.
-* Llama internamente al método privado que maneja la lógica.
-* 
-* @return void
-*/
-function add_ajax($productModel) {
-    $productModel->handleAddProductAjax();
-}
-
-/**
-* Punto de entrada para eliminar productos vía AJAX.
-* Llama internamente al método privado que maneja la lógica.
-* 
-* @return void
-*/
-function delete_ajax($productModel) {
-    $productModel->handleDeleteProductAjax();
-}
-
 /**
 * Maneja la adición de un nuevo producto vía AJAX.
 * Valida y sanitiza los datos recibidos, verifica duplicados y agrega el producto.

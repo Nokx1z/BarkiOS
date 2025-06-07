@@ -1,26 +1,41 @@
 <?php
 use Barkios\models\Supplier;
-
-$supplierModel =Supplier::getInstance();
-
+$supplierModel = Supplier::getInstance();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 handleRequest($supplierModel);
 /**
- * Acción principal: muestra la vista de administración de proveedores.
+ * index
+ * 
+ * Acción principal.
+ * Muestra la vista de administración de proveedores.
+ * 
+ * Palabras clave: vista, administración, proveedores.
+ * 
+ * @return void
  */
 function index() {
     require __DIR__ . '/../../views/admin/supplier-admin.php';
 }
 
-
+/**
+ * handleRequest
+ * 
+ * Enrutador principal de solicitudes.
+ * Determina el tipo de solicitud (AJAX o normal) y la acción a ejecutar.
+ * 
+ * Palabras clave: enrutamiento, AJAX, POST, GET, acción, logging, manejo de errores.
+ * 
+ * @param Supplier $supplierModel Instancia del modelo de proveedores.
+ * @return void
+ */
 function handleRequest($supplierModel) {
     $action = $_GET['action'] ?? '';
     $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
              strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     
-    // Log de la solicitud recibida
+    // Logging de la solicitud recibida
     error_log("Solicitud recibida - Acción: $action, Método: " . $_SERVER['REQUEST_METHOD'] . ", AJAX: " . ($isAjax ? 'Sí' : 'No'));
     
     try {
@@ -41,7 +56,7 @@ function handleRequest($supplierModel) {
                 throw new Exception('Acción no válida');
             }
         } else {
-            // Solicitudes de página normales
+            // Solicitudes normales (no AJAX)
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
                 handleAddSupplier($supplierModel);
             } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'delete') {
@@ -49,7 +64,7 @@ function handleRequest($supplierModel) {
             }
         }
     } catch (Exception $e) {
-        // Manejo de errores global
+        // Manejo global de errores
         $errorMsg = 'Error en handleRequest: ' . $e->getMessage() . ' en ' . $e->getFile() . ':' . $e->getLine();
         error_log($errorMsg);
         
@@ -72,17 +87,31 @@ function handleRequest($supplierModel) {
 }
 
 /**
+ * getSupplierr
+ * 
  * Devuelve todos los proveedores (para uso interno y vistas).
+ * 
+ * Palabras clave: consulta, listado, proveedores.
+ * 
+ * @param Supplier $supplierModel Instancia del modelo de proveedores.
  * @return array
  */
 function getSupplierr($supplierModel) {
-    return $supplierModel->getAll();;
+    return $supplierModel->getAll();
 }
 
 /**
+ * handleAddSupplier
+ * 
  * Maneja la adición de un proveedor desde formulario regular.
- * Redirige según éxito o error.
+ * Valida los datos recibidos, verifica duplicados y agrega el proveedor.
+ * Redirige según el resultado.
+ * 
+ * Palabras clave: agregar, validación, duplicados, redirección.
+ * 
+ * @param Supplier $supplierModel Instancia del modelo de proveedores.
  * @throws Exception Si falta algún campo o hay duplicado.
+ * @return void
  */
 function handleAddSupplier($supplierModel) {
     $required = ['id', 'nombre_contacto', 'nombre_empresa', 'direccion', 'tipo_rif'];
@@ -110,8 +139,17 @@ function handleAddSupplier($supplierModel) {
 }
 
 /**
+ * handleDeleteSupplier
+ * 
  * Maneja la eliminación de un proveedor por GET.
+ * Valida el ID recibido y elimina el proveedor si existe.
+ * Redirige según el resultado.
+ * 
+ * Palabras clave: eliminar, validación, redirección, proveedor.
+ * 
+ * @param Supplier $supplierModel Instancia del modelo de proveedores.
  * @throws Exception Si el ID es inválido.
+ * @return void
  */
 function handleDeleteSupplier($supplierModel) {
     if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
@@ -124,22 +162,15 @@ function handleDeleteSupplier($supplierModel) {
     }
 }
 /**
- * Alias público para agregar proveedor vía AJAX.
- */
-function add_ajax($supplierModel) {
-    $supplierModel->handleAddSupplierAjax();
-}
-
-/**
- * Alias público para eliminar proveedor vía AJAX.
- */
-function  delete_ajax($supplierModel){
-    $supplierModel->handleDeleteSupplierAjax();
-}
-
-/**
+ * handleAddSupplierAjax
+ * 
  * Maneja la adición de proveedor vía AJAX.
  * Valida campos y responde en JSON.
+ * 
+ * Palabras clave: AJAX, agregar, validación, JSON, proveedor.
+ * 
+ * @param Supplier $supplierModel Instancia del modelo de proveedores.
+ * @return void
  */
 function handleAddSupplierAjax($supplierModel) {
     try {
@@ -189,10 +220,17 @@ function handleAddSupplierAjax($supplierModel) {
     exit();
 }
 
-    /**
-     * Maneja la eliminación de proveedor vía AJAX.
-     * Valida existencia y responde en JSON.
-     */
+/**
+ * handleDeleteSupplierAjax
+ * 
+ * Maneja la eliminación de proveedor vía AJAX.
+ * Valida existencia y responde en JSON.
+ * 
+ * Palabras clave: AJAX, eliminar, validación, JSON, proveedor.
+ * 
+ * @param Supplier $supplierModel Instancia del modelo de proveedores.
+ * @return void
+ */
 function handleDeleteSupplierAjax($supplierModel) {
     try {
         if (!isset($_POST['id']) || !is_numeric($_POST['id'])) {
@@ -224,9 +262,16 @@ function handleDeleteSupplierAjax($supplierModel) {
     exit();
 }
 
-    /**
-     * Devuelve todos los proveedores en formato JSON (AJAX).
-     */
+/**
+ * getSuppliersAjax
+ * 
+ * Devuelve todos los proveedores en formato JSON (AJAX).
+ * 
+ * Palabras clave: AJAX, consulta, listado, JSON, proveedores.
+ * 
+ * @param Supplier $supplierModel Instancia del modelo de proveedores.
+ * @return void
+ */
 function getSuppliersAjax($supplierModel) {
      try {
          $suppliers = $supplierModel->getAll();
@@ -242,4 +287,4 @@ function getSuppliersAjax($supplierModel) {
          ]);
      }
      exit();
- }
+}

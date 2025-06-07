@@ -79,17 +79,6 @@ class Clients extends Database{
 
         return true;
     }
-
-    /**
-     * Vacía la tabla de clientes
-     * 
-     * @return bool True si se realizó correctamente
-     */
-    public function truncate() {
-        $stmt = $this->db->prepare("TRUNCATE TABLE clientes");
-        return $stmt->execute();
-    }
-
     /**
      * Elimina un cliente por su cédula
      * 
