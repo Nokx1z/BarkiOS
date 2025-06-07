@@ -14,6 +14,7 @@ function index() {
     require __DIR__ . '/../../views/admin/supplier-admin.php';
 }
 
+
 function handleRequest($supplierModel) {
     $action = $_GET['action'] ?? '';
     $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 

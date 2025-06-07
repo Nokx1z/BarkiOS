@@ -8,9 +8,11 @@ handleRequest($productModel);
 /**
  * Acción principal: muestra la vista de administración de productos.
  */
+
 function index() {
     require __DIR__ . '/../../views/admin/products-admin.php';
 }
+
 
 
 function handleRequest($productModel) {

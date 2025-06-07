@@ -6,6 +6,9 @@
  * Incluye un formulario para agregar nuevos clientes y una tabla para visualizar
  * y eliminar los clientes existentes.
  */
+
+// Asegurarse de que $clientss esté definido
+
 ?>
 <?= require_once __DIR__ . '/../partials/header-admin.php'; ?>
 <!-- Barra lateral de navegación -->

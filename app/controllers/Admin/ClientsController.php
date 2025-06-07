@@ -48,6 +48,7 @@ function index() {
             exit();
         } else {
             die("Error: " . $e->getMessage());
+
         }
     }
 }
