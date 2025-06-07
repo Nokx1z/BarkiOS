@@ -1,6 +1,6 @@
 <?php
 use Barkios\models\Product;
-$productModel = new Product();
+$productModel = Product::getInstance();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
