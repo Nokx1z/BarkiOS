@@ -12,19 +12,16 @@ use PDOException;
  * Proporciona métodos para gestionar productos en la base de datos,
  * incluyendo operaciones CRUD y utilidades de consulta.
  */
-class Product {
-    /** @var PDO Conexión a la base de datos */
-    private $db;
+class Product extends Database{
+    private static $instance = null;
 
-    /**
-     * Constructor.
-     * Inicializa la conexión a la base de datos usando el singleton Database.
-     */
-    public function __construct() {
-        $database = Database::getInstance();
-        $this->db = $database->getConnection();
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self(); // Instancia de Product, no de Database
+        }
+        return self::$instance;
     }
-
     /**
      * Obtiene todos los productos registrados en la base de datos.
      * 

@@ -18,7 +18,7 @@ class ProductsController {
      * Inicializa el modelo de productos.
      */
     public function __construct() {
-        $this->productModel = new Product();
+        $this->productModel = Product::getInstance();
     }
 
     /**

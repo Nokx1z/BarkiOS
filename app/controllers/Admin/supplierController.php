@@ -15,7 +15,7 @@ class SupplierController {
      * Constructor: inicializa el modelo de proveedor.
      */
     public function __construct() {
-        $this->supplierModel = new Supplier();
+        $this->supplierModel = Supplier::getInstance();
     }
 
     /**

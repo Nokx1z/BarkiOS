@@ -22,7 +22,7 @@ class ClientsController {
      * Inicializa una nueva instancia del modelo de clientes
      */
     public function __construct() {
-        $this->clientsModel = new Clients();
+        $this->clientsModel = Clients::getInstance();
     }
 
     /**

@@ -11,17 +11,15 @@ use Exception;
  * Incluye funcionalidades para crear, leer, actualizar y eliminar clientes.
  */
 
-class Clients {
-    private $db;
+class Clients extends Database{
+    private static $instance = null;
 
-    /**
-     * Constructor de la clase Clients
-     * 
-     * Inicializa la conexión con la base de datos.
-     */
-    public function __construct() {
-        $database = Database::getInstance();
-        $this->db = $database->getConnection();
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self(); // Instancia de Product, no de Database
+        }
+        return self::$instance;
     }
 
     /**

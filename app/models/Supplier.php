@@ -9,17 +9,15 @@ use PDOException;
  * Modelo Supplier
  * Encapsula la lógica de acceso a datos para la entidad Proveedor.
  */
-class Supplier {
-    /** @var PDO Instancia de conexión a la base de datos */
-    private $db;
+class Supplier extends Database{
+    private static $instance = null;
 
-    /**
-     * Constructor: inicializa la conexión a la base de datos.
-     */
-    public function __construct()
+    public static function getInstance()
     {
-        $database = Database::getInstance();
-        $this->db = $database->getConnection();   
+        if (self::$instance === null) {
+            self::$instance = new self(); // Instancia de Product, no de Database
+        }
+        return self::$instance;
     }
 
     /**
