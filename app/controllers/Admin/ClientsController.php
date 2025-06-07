@@ -201,7 +201,8 @@ class ClientsController {
      * Obtiene la lista de clientes y carga la vista correspondiente
      */
     public function index() {
-        $products = $this->getclientss();
+        $clientsModel = \Barkios\models\Clients::getInstance();
+        $clientss = $clientsModel->getAll(); // Cambia getAll() por el método real si es diferente
         require __DIR__ . '/../../views/admin/clients-admin.php';
     }
 }
