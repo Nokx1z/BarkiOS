@@ -1,17 +1,14 @@
 <?php
 use Barkios\models\Product;
-
-error_reporting(E_ALL);
-ini_set('display_errors',1);
-
 $productModel = new Product();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 handleRequest($productModel);
-
-
+/**
+ * Acción principal: muestra la vista de administración de productos.
+ */
 function index() {
-    $productModel = new Product();
-    $products = getProducts($productModel);
     require __DIR__ . '/../../views/admin/products-admin.php';
 }
 
@@ -20,10 +17,12 @@ function handleRequest($productModel) {
     $action = $_GET['action'] ?? '';
     $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
             strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-
-    ob_start();
-
+    
+    // Log de la solicitud recibida
+    error_log("Solicitud recibida - Acción: $action, Método: " . $_SERVER['REQUEST_METHOD'] . ", AJAX: " . ($isAjax ? 'Sí' : 'No'));
+    
     try {
+        // Solicitudes AJAX
         if ($isAjax) {
             header('Content-Type: application/json');
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add_ajax') {
@@ -38,6 +37,7 @@ function handleRequest($productModel) {
                 index();
             }
         } else {
+            // Solicitudes de página normales
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
                 handleAddProduct($productModel);
             } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit') {
@@ -86,77 +86,10 @@ function getProducts($productModel) {
 * @return void
 */
 function handleAddProduct($productModel) {
-    $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-
     $required = ['id', 'nombre', 'tipo', 'categoria', 'precio'];
     foreach ($required as $field) {
         if (empty($_POST[$field])) {
-            if ($isAjax) {
-                http_response_code(400);
-                echo json_encode(['success' => false, 'message' => "El campo $field es requerido"]);
-                exit;
-            } else {
-                header("Location: products-admin.php?error=campo_requerido");
-                exit;
-            }
-        }
-    }
-
-    $id = (int) $_POST['id'];
-    $nombre = htmlspecialchars(trim($_POST['nombre']));
-    $tipo = htmlspecialchars(trim($_POST['tipo']));
-    $categoria = htmlspecialchars(trim($_POST['categoria']));
-    $precio = (float)$_POST['precio'];
-
-    if ($productModel->productExists($id)) {
-        if ($isAjax) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => "Ya existe un producto con este ID"]);
-            exit;
-        } else {
-            header("Location: products-admin.php?error=id_duplicado&id=" . urlencode($id));
-            exit;
-        }
-    }
-
-    $success = $productModel->add($id, $nombre, $tipo, $categoria, $precio);
-
-    if ($isAjax) {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => $success]);
-        exit;
-    } else {
-    if ($success) {
-        header("Location: products-admin.php?success=add");
-         exit;
-    } else {
-        header("Location: products-admin.php?error=add_failed");
-         exit;
-        }
-    }
-}
-
-/**
-* Maneja la edición de un producto existente (petición normal).
-* Valida los datos recibidos, verifica existencia y actualiza el producto.
-* Redirige según el resultado.
-* 
-* @return void
-*/
-function handleEditProduct($productModel) {
-    $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-
-    $required = ['id', 'nombre', 'tipo', 'categoria', 'precio'];
-    foreach ($required as $field) {
-        if (empty($_POST[$field])) {
-            if ($isAjax) {
-                http_response_code(400);
-                echo json_encode(['success' => false, 'message' => "El campo $field es requerido"]);
-                exit;
-            } else {
-                header("Location: products-admin.php?error=campo_requerido");
-                exit;
-            }
+            throw new Exception("El campo $field es requerido");
         }
     }
 
@@ -166,33 +99,19 @@ function handleEditProduct($productModel) {
     $categoria = htmlspecialchars(trim($_POST['categoria']));
     $precio = (float) $_POST['precio'];
 
-    if (!$productModel->productExists($id)) {
-        if ($isAjax) {
-            http_response_code(404);
-            echo json_encode(['success' => false, 'message' => "El producto no existe"]);
-            exit;
-        } else {
-            header("Location: products-admin.php?error=producto_no_existe&id=" . urlencode($id));
-            exit;
-        }
+    // Verifica duplicados
+    if ($productModel->productExists($id)) {
+        header("Location: products-admin.php?error=id_duplicado&id=" . urlencode($id));
+        exit();
     }
 
-    $success = $productModel->update($id, $nombre, $tipo, $categoria, $precio);
-
-    if ($isAjax) {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => $success]);
-        exit;
-    } else {
-        if ($success) {
-            header("Location: products-admin.php?success=edit");
-        } else {
-            header("Location: products-admin.php?error=edit_failed&id=" . urlencode($id));
-        }
-        exit;
+    // Inserta producto
+    $success = $productModel->add($id, $nombre, $tipo, $categoria, $precio);
+    if ($success) {
+        header("Location: products-admin.php?success=add");
+        exit();
     }
 }
-
 /**
 * Maneja la eliminación de un producto (petición normal).
 * Valida el ID recibido y elimina el producto si existe.
@@ -205,24 +124,43 @@ function handleDeleteProduct($productModel) {
         throw new Exception("ID de producto inválido");
     }
 
-    $id = (int) $_GET['id'];
-
-    if (!$productModel->productExists($id)) {
-        throw new Exception("El producto no existe");
-    }
-
-    $success = $productModel->delete($id);
+    $success = $productModel->delete((int)$_GET['id']);
 
     if ($success) {
         header("Location: products-admin.php?success=delete");
         exit();
-    } else {
-        header("Location: products-admin.php?error=delete_failed&id=" . urlencode($id));
-        exit();
     }
 }
+/**
+* Maneja la edición de un producto existente (petición normal).
+* Valida los datos recibidos, verifica existencia y actualiza el producto.
+* Redirige según el resultado.
+* 
+* @return void
+*/
+function handleEditProduct($productModel) {
+    $required = ['id', 'nombre', 'tipo', 'categoria', 'precio'];
+    foreach ($required as $field) {
+        if (empty($_POST[$field])) {
+            throw new Exception("El campo $field es requerido");
+        }
+    }
 
+    $id = (int) $_POST['id'];
+    $nombre = htmlspecialchars(trim($_POST['nombre']));
+    $tipo = htmlspecialchars(trim($_POST['tipo']));
+    $categoria = htmlspecialchars(trim($_POST['categoria']));
+    $precio = (float) $_POST['precio'];
 
+    $success = $productModel->update($id, $nombre, $tipo, $categoria, $precio);
+
+    if ($success) {
+            header("Location: products-admin.php?success=edit");
+    } else {
+            header("Location: products-admin.php?error=edit_failed&id=" . urlencode($id));
+    }
+        exit;
+}
 /**
 * Punto de entrada para agregar productos vía AJAX.
 * Llama internamente al método privado que maneja la lógica.
@@ -259,12 +197,10 @@ function handleAddProductAjax($productModel) {
         $required = ['id', 'nombre', 'tipo', 'categoria', 'precio'];
         $data = [];
         foreach ($required as $field) {
-            if (!isset($_POST[$field]) || (is_string($_POST[$field]) && trim($_POST[$field]) === '')) {
+            if (empty($_POST[$field])) {
                 throw new Exception("El campo $field es requerido");
             }
-            $data[$field] = $field === 'id' ? (int)$_POST[$field] :
-                          ($field === 'precio' ? (float)$_POST[$field] :
-                          htmlspecialchars(trim($_POST[$field])));
+            $data[$field] = trim($_POST[$field]);
         }
 
         if ($productModel->productExists($data['id'])) {
@@ -475,7 +411,3 @@ function getProductsAjax($productModel) {
     }
     exit();
 }
-
-
-
-
