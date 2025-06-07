@@ -59,23 +59,27 @@
                         <div class="mb-3">
                             <label class="form-label">Código</label>
                             <input type="text" class="form-control" 
-                                id="productId"
-                                name="id" 
-                                placeholder="Ingrese código del producto" 
-                                inputmode="numeric"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '');"
-                                required>
+                            id="productId"
+                            name="id" 
+                            placeholder="Ingrese código del producto" 
+                            inputmode="numeric"
+                            maxlength="9"
+                            minlength="9"
+                            pattern="^\d{9}$"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,9);"
+                            required>
                             <div class="invalid-feedback">Por favor ingrese un código válido</div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Nombre</label>
                             <input type="text" class="form-control" 
-                                id="productName"
-                                name="nombre" 
-                                placeholder="Ingrese nombre del producto" 
-                                pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
-                                oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');"
-                                required>
+                            id="productName"
+                            name="nombre" 
+                            placeholder="Ingrese nombre del producto" 
+                            maxlength="40"
+                            pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{1,40}$"
+                            oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '').slice(0,40);"
+                            required>
                             <div class="invalid-feedback">Por favor ingrese un nombre válido (solo letras y espacios)</div>
                         </div>
                         <div class="mb-3">
@@ -110,10 +114,14 @@
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" step="0.01" class="form-control" 
-                                    id="productPrice" 
-                                    name="precio" 
-                                    min="0" 
-                                    required>
+                                step="0.01" 
+                                class="form-control" 
+                                id="productPrice" 
+                                name="precio" 
+                                min="0"
+                                max="999.99"
+                                oninput="if(this.value.length > 11) this.value = this.value.slice(0,11);"
+                                required>
                                 <div class="invalid-feedback">Por favor ingrese un precio válido</div>
                             </div>
                         </div>
