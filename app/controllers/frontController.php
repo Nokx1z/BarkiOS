@@ -21,8 +21,8 @@ class FrontController {
             $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
             $scriptName = $_SERVER['SCRIPT_NAME'];
 
-            $path = str_replace(dirname($scriptName), '', $requestUri);
-            $path = preg_replace('#^/index\.php#', '', $path);
+            $basepath = str_replace('/index.php', '', $scriptName);
+            $path = str_replace($basepath, '', $requestUri);
             $path = trim(parse_url($path, PHP_URL_PATH), '/');
 
             $segments = array_filter(explode('/', $path));
