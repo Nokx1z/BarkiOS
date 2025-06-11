@@ -13,28 +13,27 @@ class FrontController {
     }
 
     private function parseUrl() {
-        if (isset($_GET['controller']) && isset($_GET['action'])) {
-            $this->controller = $this->sanitize($_GET['controller']);
-            $this->action = $this->sanitize($_GET['action']);
-            $this->params = $_GET['params'] ?? [];
-        } else {
-            $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
-            $scriptName = $_SERVER['SCRIPT_NAME'];
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 
-            $basepath = str_replace('/index.php', '', $scriptName);
-            $path = str_replace($basepath, '', $requestUri);
-            $path = trim(parse_url($path, PHP_URL_PATH), '/');
+        // Quita el query string
+        $uri = parse_url($requestUri, PHP_URL_PATH);
 
-            $segments = array_filter(explode('/', $path));
-
-            if (isset($segments[0]) && strtolower($segments[0]) === 'admin') {
-                array_shift($segments);
-            }
-
-            $this->controller = $this->sanitize($segments[0] ?? 'products');
-            $this->action = $this->sanitize($segments[1] ?? 'index');
-            $this->params = array_slice($segments, 2);
+        // Quita el path base '/barkios/app/' (ajusta si cambias la carpeta)
+        $base = '/BarkiOS/'; // Usa el nombre real de tu carpeta en Windows
+        if (stripos($uri, $base) === 0) {
+            $uri = substr($uri, strlen($base));
         }
+
+        $segments = array_values(array_filter(explode('/', $uri)));
+
+        // Soporte para rutas admin
+        if (isset($segments[0]) && strtolower($segments[0]) === 'admin') {
+            array_shift($segments);
+        }
+
+        $this->controller = $this->sanitize($segments[0] ?? 'home');
+        $this->action = $this->sanitize($segments[1] ?? 'index');
+        $this->params = array_slice($segments, 2);
     }
 
     private function sanitize($input) {
@@ -54,8 +53,7 @@ class FrontController {
 
         require_once $controllerFile;
 
-        // Asume que las funciones están definidas globalmente (no dentro de clases)
-        $functionName = $this->action; // Ej: index, store, update, etc.
+        $functionName = $this->action;
 
         if (!function_exists($functionName)) {
             return $this->renderNotFound("Función '{$functionName}' no encontrada en $controllerFile", $isAjax);
