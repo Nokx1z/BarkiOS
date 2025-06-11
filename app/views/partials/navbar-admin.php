@@ -6,25 +6,25 @@
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="/app/admin/products/">
+                    <a class="nav-link" href="/BarkiOS/home/">
                         <i class="fas fa-tachometer-alt"></i>
                         Inicio
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/app/admin/products/">
+                    <a class="nav-link" href="/BarkiOS/products/">
                         <i class="fas fa-tshirt"></i>
                         Productos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/app/admin/supplier/">
+                    <a class="nav-link" href="/BarkiOS/supplier/">
                         <i class="fas fa-shopping-cart"></i>
                         Proveedores
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/app/admin/clients/">
+                    <a class="nav-link" href="/BarkiOS/clients/">
                         <i class="fas fa-users"></i>
                         Clientes
                     </a>

@@ -11,8 +11,8 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Favicon -->
-    <link rel="shortcut icon" href="../../../public/assets/icons/Logo - Garage Barki.webp" type="image/x-icon">
+    <link rel="shortcut icon" href= "/BarkiOS/public/assets/icons/Logo - Garage Barki.webp" type="image/x-icon">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../../../public/assets/css/admin-styles.css">
+    <link rel="stylesheet" href="/Barkios/public/assets/css/admin-styles.css">
 </head>
 <body>
