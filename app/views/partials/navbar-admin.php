@@ -30,5 +30,11 @@
                     </a>
                 </li>
             </ul>
+             <div class="sidebar-footer">
+                <a class="nav-link" href="/BarkiOS/login/">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Cerrar Sesión
+                </a>
+            </div>
         </div>
 </nav>
