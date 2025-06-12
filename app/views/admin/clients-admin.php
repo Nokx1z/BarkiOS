@@ -137,11 +137,23 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editClientForm">
-                <input type="hidden" name="cedula" id="editClientCedula">
                 <div class="modal-body">
                     <div id="editClientErrors" class="alert alert-danger d-none"></div>
                     <div class="mb-3">
                 </div>
+                    <div class="mb-3">
+                    <label class="form-label">Cédula</label>
+                    <input type="text" class="form-control" 
+                        id="editClientCedula"
+                        name="cedula" 
+                        placeholder="Ingrese la cédula del cliente" 
+                        inputmode="numeric"
+                        maxlength="9"
+                        minlength="7"
+                        pattern="^\d{7,9}$"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,9);"
+                        disabled>
+                    <div class="invalid-feedback">Por favor ingrese una cédula válida (7 a 9 dígitos)</div>
                     <div class="mb-3">
                         <label class="form-label">Nombre</label>
                         <input type="text" class="form-control" 
