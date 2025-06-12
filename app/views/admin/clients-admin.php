@@ -1,6 +1,8 @@
-<?= require_once __DIR__ . '/../partials/header-admin.php'; ?>
+<?php $pageTitle = "Clientes | Garage Barki"; ?>
+<?php require_once __DIR__ . '/../partials/header-admin.php'; ?>
 <!-- Barra lateral de navegación -->
 <?= require_once __DIR__ . '/../partials/navbar-admin.php'; ?> 
+
 
 <div class="main-content">
     <div class="container-fluid">

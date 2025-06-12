@@ -1,3 +1,6 @@
+<?php $pageTitle = "Proveedores | Garage Barki"; ?>
+<?php require_once __DIR__ . '/../partials/header-admin.php'; ?>
+
 <?= require_once __DIR__ . '/../partials/header-admin.php'; ?>
 <!-- Barra lateral de navegación -->
 <?= require_once __DIR__ . '/../partials/navbar-admin.php'; ?> 
