@@ -1,287 +1,128 @@
-    $(document).ready(function() {
-        // Inicializar tooltips de Bootstrap
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
+document.addEventListener('DOMContentLoaded', () => {
+    const suppliersTableBody = document.getElementById('suppliersTableBody');
+    const alertContainer = document.getElementById('alertContainer');
+    const addSupplierForm = document.getElementById('addSupplierForm');
+    const editSupplierForm = document.getElementById('editSupplierForm');
+
+    // Utilidad para escapar HTML
+    const escapeHtml = str => String(str ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    const showAlert = (msg, type = 'info') => {
+        alertContainer.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${msg}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`;
+        setTimeout(() => alertContainer.innerHTML = '', 4000);
+    };
+
+    function fetchSuppliers() {
+        suppliersTableBody.innerHTML = `<tr><td colspan="6" class="text-center">
+            <div class="spinner-border text-primary"></div> Cargando...</td></tr>`;
+        fetch(window.location.pathname + '?action=get_suppliers', {headers: {'X-Requested-With':'XMLHttpRequest'}})
+        .then(r => r.json()).then(data => {
+            if (!data.suppliers?.length) return suppliersTableBody.innerHTML =
+                `<td colspan="6" class="text-center">
+                    <div class="alert alert-info mb-0">No hay proveedores disponibles</div>
+                </td>`;
+            suppliersTableBody.innerHTML = data.suppliers.map(s => `
+                <tr id="proveedor-${escapeHtml(s.id)}">
+                    <td>${escapeHtml(s.tipo_rif)}-${escapeHtml(s.id)}</td>
+                    <td>${escapeHtml(s.tipo_rif)}</td>
+                    <td>${escapeHtml(s.nombre_contacto)}</td>
+                    <td>${escapeHtml(s.nombre_empresa)}</td>
+                    <td>${escapeHtml(s.direccion)}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-primary btn-editar"
+                            data-id="${escapeHtml(s.id)}"
+                            data-tipo_rif="${escapeHtml(s.tipo_rif)}"
+                            data-nombre_contacto="${escapeHtml(s.nombre_contacto)}"
+                            data-nombre_empresa="${escapeHtml(s.nombre_empresa)}"
+                            data-direccion="${escapeHtml(s.direccion)}">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger btn-eliminar"
+                            data-id="${escapeHtml(s.id)}"
+                            data-nombre="${escapeHtml(s.nombre_contacto)}">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </td>
+                </tr>`).join('');
+            document.querySelectorAll('.btn-eliminar').forEach(btn => btn.onclick = handleDelete);
+            document.querySelectorAll('.btn-editar').forEach(btn => btn.onclick = () => loadSupplierForEdit(btn));
+        }).catch(() => showAlert('Error al cargar proveedores', 'danger'));
+    }
+
+    function handleAdd(e) {
+        e.preventDefault();
+        const fd = new URLSearchParams(new FormData(addSupplierForm));
+        fetch('supplier-admin.php?action=add_ajax', {
+            method: 'POST',
+            headers: {'X-Requested-With':'XMLHttpRequest','Content-Type':'application/x-www-form-urlencoded'},
+            body: fd
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                showAlert('Proveedor agregado', 'success');
+                addSupplierForm.reset();
+                bootstrap.Modal.getInstance(document.getElementById('addSupplierModal')).hide();
+                fetchSuppliers();
+            } else showAlert(data.message, 'danger');
+        }).catch(() => showAlert('Error al agregar', 'danger'));
+    }
+
+    function loadSupplierForEdit(btn) {
+        document.getElementById('editSupplierId').value = btn.getAttribute('data-id');
+        document.getElementById('editSupplierTipoRif').value = btn.getAttribute('data-tipo_rif');
+        document.getElementById('editSupplierRif').value = btn.getAttribute('data-id');
+        document.getElementById('editSupplierNombreContacto').value = btn.getAttribute('data-nombre_contacto');
+        document.getElementById('editSupplierNombreEmpresa').value = btn.getAttribute('data-nombre_empresa');
+        document.getElementById('editSupplierDireccion').value = btn.getAttribute('data-direccion');
+        const modal = new bootstrap.Modal(document.getElementById('editSupplierModal'));
+        modal.show();
+    }
+
+    function handleEdit(e) {
+        e.preventDefault();
+        const fd = new URLSearchParams(new FormData(editSupplierForm));
+        fetch('supplier-admin.php?action=edit_ajax', {
+            method: 'POST',
+            headers: {'X-Requested-With':'XMLHttpRequest','Content-Type':'application/x-www-form-urlencoded'},
+            body: fd
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                showAlert('Proveedor actualizado', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('editSupplierModal')).hide();
+                fetchSuppliers();
+            } else showAlert(data.message, 'danger');
+        }).catch(() => showAlert('Error al actualizar', 'danger'));
+    }
+
+    function handleDelete(e) {
+        const id = e.currentTarget.dataset.id;
+        const nombre = e.currentTarget.dataset.nombre;
+        Swal.fire({
+            title: '¿Eliminar proveedor?',
+            html: `¿Deseas eliminar <strong>${escapeHtml(nombre)}</strong>?`,
+            icon: 'warning', showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar'
+        }).then(res => {
+            if (res.isConfirmed) {
+                fetch('supplier-admin.php?action=delete_ajax', {
+                    method: 'POST',
+                    headers: {'X-Requested-With':'XMLHttpRequest','Content-Type':'application/x-www-form-urlencoded'},
+                    body: `id=${encodeURIComponent(id)}`
+                }).then(r => r.json()).then(data => {
+                    if (data.success) {
+                        showAlert('Proveedor eliminado', 'success');
+                        fetchSuppliers();
+                    } else showAlert(data.message, 'danger');
+                }).catch(() => showAlert('Error al eliminar', 'danger'));
+            }
         });
+    }
 
-        // Función para mostrar mensajes
-        function showMessage(type, message) {
-            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-            const icon = type === 'success' ? 'check-circle' : 'exclamation-triangle';
-            
-            // Cerrar cualquier mensaje existente
-            $('.alert').alert('close');
-            
-            const alert = `
-                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-                    <i class="fas fa-${icon} me-2"></i>
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-                </div>`;
-                
-            $('#message-container').html(alert);
-            
-            // Ocultar el mensaje después de 5 segundos
-            setTimeout(() => {
-                $('.alert').fadeOut('slow');
-            }, 5000);
-        }
-
-        // Función para actualizar la tabla de proveedores
-        function updateSuppliersTable() {
-            const $table = $('#suppliers-table');
-            const $loading = $('#table-loading');
-            const $tbody = $table.find('tbody');
-            
-            // Mostrar cargador y ocultar tabla
-            $loading.removeClass('d-none');
-            $table.addClass('d-none');
-            
-            $.ajax({
-                url: 'index.php?controller=supplier&action=get_suppliers',
-                type: 'GET',
-                dataType: 'json',
-                success: function(suppliers) {
-                    $tbody.empty();
-                    
-                    if (suppliers.length > 0) {
-                        suppliers.forEach(supplier => {
-                            const row = `
-                                <tr>
-                                    <td>${supplier.tipo_rif}-${supplier.id}</td>
-                                    <td>${supplier.nombre_contacto}</td>
-                                    <td>${supplier.nombre_empresa}</td>
-                                    <td>${supplier.direccion}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary edit-supplier"
-                                                data-id="${supplier.id}"
-                                                data-nombre_contacto="${supplier.nombre_contacto}"
-                                                data-nombre_empresa="${supplier.nombre_empresa}"
-                                                data-tipo_rif="${supplier.tipo_rif}"
-                                                data-direccion="${supplier.direccion}">
-                                            <i class="fas fa-edit"></i> Editar
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger delete-supplier" 
-                                                data-id="${supplier.id}"
-                                                data-nombre="${supplier.nombre_contacto}"
-                                                data-bs-toggle="tooltip"
-                                                title="Eliminar proveedor">
-                                            <i class="fas fa-trash"></i> Eliminar
-                                        </button>
-                                    </td>
-                                </tr>`;
-                            $tbody.append(row);
-                        });
-                    } else {
-                        $tbody.html(`
-                            <tr>
-                                <td colspan="5" class="text-center">
-                                    <div class="alert alert-info mb-0">No hay proveedores registrados</div>
-                                </td>
-                            </tr>`);
-                    }
-                    
-                    // Ocultar cargador y mostrar tabla
-                    $loading.addClass('d-none');
-                    $table.removeClass('d-none');
-                    
-                    // Reinicializar tooltips
-                    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-                        new bootstrap.Tooltip(tooltipTriggerEl);
-                    });
-                    
-                    // Reasignar eventos de eliminación
-                    $('.delete-supplier').on('click', handleDeleteSupplier);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error al cargar proveedores:', { status, error, response: xhr.responseText });
-                    $loading.addClass('d-none');
-                    $table.removeClass('d-none');
-                    $tbody.html('<tr><td colspan="5" class="text-center text-danger">Error al cargar los datos. Intenta recargar la página.</td></tr>');
-                    showMessage('error', 'Error al cargar los proveedores. Por favor, recarga la página.');
-                }
-            });
-        }
-
-        // Función para manejar el envío del formulario
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            const $form = $(this);
-            const $submitBtn = $form.find('button[type="submit"]');
-            const originalBtnText = $submitBtn.html();
-            
-            // Validar el formulario
-            const formData = {
-                id: $form.find('input[name="id"]').val().trim(),
-                nombre_contacto: $form.find('input[name="nombre_contacto"]').val().trim(),
-                nombre_empresa: $form.find('input[name="nombre_empresa"]').val().trim(),
-                direccion: $form.find('input[name="direccion"]').val().trim(),
-                tipo_rif: $form.find('select[name="tipo_rif"]').val()
-            };
-            
-            // Configurar la URL con el parámetro de acción
-            const url = 'index.php?controller=supplier&action=add_ajax';
-            
-            // Validación del lado del cliente
-            if (!formData.id || formData.id.length !== 9) {
-                showMessage('error', 'El RIF debe tener exactamente 9 dígitos');
-                return false;
-            }
-            
-            if (!formData.nombre_contacto) {
-                showMessage('error', 'El nombre del contacto es obligatorio');
-                return false;
-            }
-            
-            // Deshabilitar el botón y mostrar spinner
-            $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...');
-            
-            console.log('Enviando datos:', formData); // Depuración
-            
-            // Enviar la solicitud AJAX
-            console.log('Enviando a:', url, 'Datos:', formData);
-            
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: formData,
-                dataType: 'json',
-                success: function(response) {
-                    console.log('Respuesta recibida:', response); // Depuración
-                    
-                    if (response && response.success) {
-                        showMessage('success', 'Proveedor agregado correctamente');
-                        $('#addSupplierModal').modal('hide');
-                        updateSuppliersTable();
-                        $form[0].reset();
-                    } else {
-                        const errorMsg = response && response.message ? response.message : 'Error desconocido al agregar el proveedor';
-                        showMessage('error', errorMsg);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error en la solicitud AJAX:', { status, error, response: xhr.responseText });
-                    
-                    let errorMessage = 'Error en la solicitud al servidor';
-                    
-                    try {
-                        const response = JSON.parse(xhr.responseText);
-                        if (response && response.message) {
-                            errorMessage = response.message;
-                        } else if (xhr.status === 0) {
-                            errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión a Internet.';
-                        } else if (xhr.status === 500) {
-                            errorMessage = 'Error interno del servidor. Por favor, contacta al administrador.';
-                        }
-                    } catch (e) {
-                        console.error('Error al analizar la respuesta del servidor:', e);
-                    }
-                    
-                    showMessage('error', errorMessage);
-                },
-                complete: function() {
-                    $submitBtn.prop('disabled', false).html(originalBtnText);
-                }
-            });
-        }
-        
-        // Asignar el manejador de eventos al formulario
-        $('#addSupplierForm').on('submit', handleFormSubmit);
-
-        // Cerrar el modal y limpiar el formulario
-        $('#addSupplierModal').on('hidden.bs.modal', function () {
-            $('#addSupplierForm')[0].reset();
-            $('#addSupplierForm .is-invalid').removeClass('is-invalid');
-            $('.invalid-feedback').remove();
-        });
-        
-
-        // Función para manejar la eliminación de proveedores
-        function handleDeleteSupplier() {
-            const button = $(this);
-            const supplierId = button.data('id');
-            const supplierName = button.data('nombre');
-            
-            if (!supplierId || !supplierName) {
-                console.error('Datos de proveedor inválidos:', { id: supplierId, name: supplierName });
-                showMessage('error', 'Datos de proveedor inválidos');
-                return;
-            }
-            
-            console.log('Iniciando eliminación del proveedor:', { id: supplierId, name: supplierName });
-            
-            Swal.fire({
-                title: '¿Estás seguro?',
-                html: `¿Deseas eliminar al proveedor <strong>${supplierName}</strong>?<br>Esta acción no se puede deshacer.`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="fas fa-trash me-1"></i> Sí, eliminar',
-                cancelButtonText: '<i class="fas fa-times me-1"></i> Cancelar',
-                reverseButtons: true,
-                showLoaderOnConfirm: true,
-                preConfirm: () => {
-                    return new Promise((resolve) => {
-                        console.log('Enviando solicitud de eliminación para el proveedor ID:', supplierId);
-                        
-const deleteUrl = `index.php?controller=supplier&action=delete_ajax`;
-                        console.log('Enviando eliminación a:', deleteUrl, 'ID:', supplierId);
-                        
-                        $.ajax({
-                            url: deleteUrl,
-                            type: 'POST',
-                            data: {
-                                id: supplierId
-                            },
-                            dataType: 'json',
-                            success: function(response) {
-                                console.log('Respuesta de eliminación recibida:', response);
-                                resolve(response);
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Error en la solicitud de eliminación:', { status, error, response: xhr.responseText });
-                                let errorMsg = 'Error en la solicitud de eliminación';
-                                
-                                try {
-                                    const response = JSON.parse(xhr.responseText);
-                                    if (response && response.message) {
-                                        errorMsg = response.message;
-                                    }
-                                } catch (e) {
-                                    console.error('Error al analizar la respuesta de error:', e);
-                                }
-                                
-                                resolve({ 
-                                    success: false, 
-                                    message: errorMsg 
-                                });
-                            }
-                        });
-                    });
-                },
-                allowOutsideClick: () => !Swal.isLoading()
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    if (result.value && result.value.success) {
-                        showMessage('success', 'Proveedor eliminado correctamente');
-                        updateSuppliersTable();
-                    } else {
-                        const errorMsg = result.value && result.value.message 
-                            ? result.value.message 
-                            : 'Error al eliminar el proveedor';
-                        showMessage('error', errorMsg);
-                    }
-                }
-            });
-        }
-
-        // Asignar el manejador de eventos a los botones de eliminar
-        $(document).on('click', '.delete-supplier', handleDeleteSupplier);
-        
-        // Cargar la tabla inicialmente
-        updateSuppliersTable();
-    });
+    // Inicialización
+    if (addSupplierForm) addSupplierForm.onsubmit = handleAdd;
+    if (editSupplierForm) editSupplierForm.onsubmit = handleEdit;
+    fetchSuppliers();
+});

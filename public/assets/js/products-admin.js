@@ -59,19 +59,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(() => showAlert('Error al agregar', 'danger'));
     }
 
-    function loadProductForEdit(id) {
-        fetch(window.location.pathname + `?action=get_products&id=${id}`, {headers: {'X-Requested-With':'XMLHttpRequest'}})
-        .then(r => r.json()).then(data => {
-            if (data.success && data.products?.length) {
-                const p = data.products[0];
-                editProductForm.id.value = p.id;
-                editProductForm.nombre.value = p.nombre;
-                editProductForm.tipo.value = p.tipo;
-                editProductForm.categoria.value = p.categoria;
-                editProductForm.precio.value = p.precio;
-            } else showAlert('No se encontró el producto', 'danger');
-        }).catch(() => showAlert('Error al cargar producto', 'danger'));
-    }
+function loadProductForEdit(btn) {
+    document.getElementById('editProductId').value = btn.getAttribute('data-id'); // input hidden
+    document.getElementById('productId').value = btn.getAttribute('data-id'); // input visible, readonly
+    document.getElementById('editProductName').value = btn.getAttribute('data-nombre');
+    document.getElementById('editProductCategory').value = btn.getAttribute('data-categoria');
+    document.getElementById('editProductType').value = btn.getAttribute('data-tipo');
+    document.getElementById('editProductPrice').value = btn.getAttribute('data-precio');
+    const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
+    modal.show();
+}
 
     function handleEdit(e) {
         e.preventDefault();
