@@ -1,0 +1,119 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const productsTableBody = document.getElementById('productsTableBody');
+    const alertContainer = document.getElementById('alertContainer');
+    const addProductForm = document.getElementById('addProductForm');
+    const editProductForm = document.getElementById('editProductForm');
+
+    // Utilidades
+    const escapeHtml = str => String(str ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    const showAlert = (msg, type = 'info') => {
+        alertContainer.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${msg}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`;
+        setTimeout(() => alertContainer.innerHTML = '', 4000);
+    };
+
+    // CRUD AJAX
+    function fetchProducts() {
+        productsTableBody.innerHTML = `<tr><td colspan="6" class="text-center">
+            <div class="spinner-border text-primary"></div> Cargando...</td></tr>`;
+        fetch(window.location.pathname + '?action=get_products', {headers: {'X-Requested-With':'XMLHttpRequest'}})
+        .then(r => r.json()).then(data => {
+            if (!data.products?.length) return productsTableBody.innerHTML =
+                `<td colspan="6" class="text-center">
+                                            <div class="alert alert-info mb-0">No hay productos disponibles</div>
+                                        </td>`;
+            productsTableBody.innerHTML = data.products.map(p => `
+                <tr data-product-id="${p.id}">
+                    <td>${p.id}</td>
+                    <td>${escapeHtml(p.nombre)}</td>
+                    <td>${escapeHtml(p.tipo)}</td>
+                    <td>${escapeHtml(p.categoria)}</td>
+                    <td>$${parseFloat(p.precio).toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary btn-edit" data-bs-toggle="modal" data-bs-target="#editProductModal" data-product-id="${p.id}"><i class="fas fa-edit"></i>Editar</button>
+                        <button class="btn btn-sm btn-outline-danger btn-delete" data-product-id="${p.id}" data-product-name="${escapeHtml(p.nombre)}"><i class="fas fa-trash"></i>Eliminar</button>
+                    </td>
+                </tr>`).join('');
+            document.querySelectorAll('.btn-delete').forEach(btn => btn.onclick = handleDelete);
+            document.querySelectorAll('.btn-edit').forEach(btn => btn.onclick = () => loadProductForEdit(btn.dataset.productId));
+        }).catch(() => showAlert('Error al cargar productos', 'danger'));
+    }
+
+    function handleAdd(e) {
+        e.preventDefault();
+        const fd = new URLSearchParams(new FormData(addProductForm));
+        fetch('index.php?controller=products&action=add_ajax', {
+            method: 'POST', headers: {'X-Requested-With':'XMLHttpRequest','Content-Type':'application/x-www-form-urlencoded'},
+            body: fd
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                showAlert('Producto agregado', 'success');
+                addProductForm.reset();
+                bootstrap.Modal.getInstance(document.getElementById('addProductModal')).hide();
+                fetchProducts();
+            } else showAlert(data.message, 'danger');
+        }).catch(() => showAlert('Error al agregar', 'danger'));
+    }
+
+    function loadProductForEdit(id) {
+        fetch(window.location.pathname + `?action=get_products&id=${id}`, {headers: {'X-Requested-With':'XMLHttpRequest'}})
+        .then(r => r.json()).then(data => {
+            if (data.success && data.products?.length) {
+                const p = data.products[0];
+                editProductForm.id.value = p.id;
+                editProductForm.nombre.value = p.nombre;
+                editProductForm.tipo.value = p.tipo;
+                editProductForm.categoria.value = p.categoria;
+                editProductForm.precio.value = p.precio;
+            } else showAlert('No se encontró el producto', 'danger');
+        }).catch(() => showAlert('Error al cargar producto', 'danger'));
+    }
+
+    function handleEdit(e) {
+        e.preventDefault();
+        const fd = new URLSearchParams(new FormData(editProductForm));
+        fetch(window.location.pathname + '?action=edit_ajax', {
+            method: 'POST', headers: {'X-Requested-With':'XMLHttpRequest','Content-Type':'application/x-www-form-urlencoded'},
+            body: fd
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                showAlert('Producto actualizado', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('editProductModal')).hide();
+                fetchProducts();
+            } else showAlert(data.message, 'danger');
+        }).catch(() => showAlert('Error al actualizar', 'danger'));
+    }
+
+    function handleDelete(e) {
+        const id = e.currentTarget.dataset.productId;
+        const name = e.currentTarget.dataset.productName;
+        Swal.fire({
+            title: '¿Eliminar producto?',
+            html: `¿Deseas eliminar <strong>${escapeHtml(name)}</strong>?`,
+            icon: 'warning', showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar'
+        }).then(res => {
+            if (res.isConfirmed) {
+                fetch('index.php?controller=products&action=delete_ajax', {
+                    method: 'POST',
+                    headers: {'X-Requested-With':'XMLHttpRequest','Content-Type':'application/x-www-form-urlencoded'},
+                    body: `id=${encodeURIComponent(id)}`
+                }).then(r => r.json()).then(data => {
+                    if (data.success) {
+                        showAlert('Producto eliminado', 'success');
+                        fetchProducts();
+                    } else showAlert(data.message, 'danger');
+                }).catch(() => showAlert('Error al eliminar', 'danger'));
+            }
+        });
+    }
+
+    // Inicialización
+    if (addProductForm) addProductForm.onsubmit = handleAdd;
+    if (editProductForm) editProductForm.onsubmit = handleEdit;
+    fetchProducts();
+});
