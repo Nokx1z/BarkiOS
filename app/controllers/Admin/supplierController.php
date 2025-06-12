@@ -288,3 +288,59 @@ function getSuppliersAjax($supplierModel) {
      }
      exit();
 }
+
+/**
+ * handleEditSupplierAjax
+ * 
+ * Maneja la edición de proveedor vía AJAX.
+ * Valida campos y responde en JSON.
+ * 
+ * Palabras clave: AJAX, editar, validación, JSON, proveedor.
+ * 
+ * @param Supplier $supplierModel Instancia del modelo de proveedores.
+ * @return void
+ */
+function handleEditSupplierAjax($supplierModel) {
+    header('Content-Type: application/json; charset=utf-8');
+
+    try {
+        $required = ['id', 'nombre', 'direccion', 'telefono', 'email'];
+        $data = [];
+        foreach ($required as $field) {
+            if (empty($_POST[$field])) {
+                throw new Exception("El campo $field es requerido");
+            }
+            $data[$field] = $field === 'id' ? (int)$_POST[$field] : htmlspecialchars(trim($_POST[$field]));
+        }
+
+        if (!$supplierModel->supplierExists($data['id'])) {
+            throw new Exception("El proveedor no existe");
+        }
+
+        $success = $supplierModel->update(
+            $data['id'],
+            $data['nombre'],
+            $data['direccion'],
+            $data['telefono'],
+            $data['email']
+        );
+
+        if ($success) {
+            $supplier = $supplierModel->getByid($data['id']);
+            echo json_encode([
+                'success' => true,
+                'message' => 'Proveedor actualizado correctamente',
+                'supplier' => $supplier
+            ]);
+        } else {
+            throw new Exception("Error al actualizar el proveedor");
+        }
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+    exit();
+}

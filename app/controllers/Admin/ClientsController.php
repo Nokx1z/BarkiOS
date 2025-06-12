@@ -31,14 +31,17 @@ function index() {
     $action = $_GET['action'] ?? '';
     $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
              strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
-    
+
     try {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
             handleAddclients($clientsModel);
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit') {
+            handleEditclients($clientsModel); // <-- Agrega esta función para editar por POST normal
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit_ajax') {
+            handleEditClientAjax($clientsModel); // <-- Ya tienes esta función para AJAX
         } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'delete') {
             handleDeleteclients($clientsModel);
         } else if ($isAjax) {
-            // Si es AJAX pero no coincide con ninguna acción, devolver error
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Acción no válida']);
             exit();
@@ -50,7 +53,6 @@ function index() {
             exit();
         } else {
             die("Error: " . $e->getMessage());
-
         }
     }
 }
@@ -170,4 +172,100 @@ function handleDeleteclients($clientsModel) {
         }
         exit();
     }
+}
+
+/**
+ * Maneja la edición de un cliente existente
+ * 
+ * Procesa el formulario de edición de cliente, valida los datos
+ * y devuelve una respuesta JSON si es una petición AJAX
+ * o redirige a la página correspondiente en caso contrario
+ */
+function handleEditClientAjax($clientModel) {
+    header('Content-Type: application/json; charset=utf-8');
+
+    try {
+        $required = ['cedula', 'nombre', 'direccion', 'telefono', 'membresia'];
+        $data = [];
+        foreach ($required as $field) {
+            if (empty($_POST[$field])) {
+                throw new Exception("El campo $field es requerido");
+            }
+            $data[$field] = htmlspecialchars(trim($_POST[$field]));
+        }
+
+        if (!$clientModel->clientExists($data['cedula'])) {
+            throw new Exception("El cliente no existe");
+        }
+
+        $success = $clientModel->update(
+            $data['cedula'],
+            $data['nombre'],
+            $data['direccion'],
+            $data['telefono'],
+            $data['membresia']
+        );
+
+        if ($success) {
+            $client = $clientModel->getById($data['cedula']);
+            echo json_encode([
+                'success' => true,
+                'message' => 'Cliente actualizado correctamente',
+                'client' => $client // <-- clave correcta
+            ]);
+            exit();
+        } else {
+            throw new Exception("Error al actualizar el cliente");
+        }
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+    exit();
+}
+
+/**
+ * Maneja la edición de un cliente existente
+ * 
+ * Procesa el formulario de edición de cliente, valida los datos
+ * y devuelve una respuesta JSON si es una petición AJAX
+ * o redirige a la página correspondiente en caso contrario
+ */
+function handleEditclients($clientsModel) {
+    $response = ['success' => false, 'message' => ''];
+    try {
+        $required = ['cedula', 'nombre', 'direccion', 'telefono', 'membresia'];
+        foreach ($required as $field) {
+            if (empty($_POST[$field])) {
+                throw new Exception("El campo $field es requerido");
+            }
+        }
+        $cedula = htmlspecialchars(trim($_POST['cedula']));
+        $nombre = htmlspecialchars(trim($_POST['nombre']));
+        $direccion = htmlspecialchars(trim($_POST['direccion']));
+        $telefono = htmlspecialchars(trim($_POST['telefono']));
+        $membresia = htmlspecialchars(trim($_POST['membresia']));
+
+        if (!$clientsModel->clientExists($cedula)) {
+            throw new Exception("El cliente no existe");
+        }
+        $success = $clientsModel->update($cedula, $nombre, $direccion, $telefono, $membresia);
+        if ($success) {
+            $response['success'] = true;
+            $response['message'] = 'Cliente actualizado correctamente';
+        } else {
+            throw new Exception("Error al actualizar el cliente");
+        }
+    } catch (Exception $e) {
+        $response['message'] = $e->getMessage();
+    }
+    if ($response['success']) {
+        header("Location: clients-admin.php?success=edit");
+    } else {
+        header("Location: clients-admin.php?error=" . urlencode($response['message']) . "&cedula=" . urlencode($_POST['cedula'] ?? ''));
+    }
+    exit();
 }
