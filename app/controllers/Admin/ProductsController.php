@@ -47,7 +47,7 @@ function handleAddEdit($productModel, $mode) {
     foreach ($fields as $f) {
         if (empty($_POST[$f])) throw new Exception("El campo $f es requerido");
     }
-    $id = (int)$_POST['id'];
+    $id = trim($_POST['id']);
     $nombre = trim($_POST['nombre']);
     $tipo = trim($_POST['tipo']);
     $categoria = trim($_POST['categoria']);
@@ -66,7 +66,7 @@ function handleAddEdit($productModel, $mode) {
 }
 
 function handleDelete($productModel) {
-    if (!isset($_GET['id']) || !is_numeric($_GET['id'])) throw new Exception("ID inválido");
+    if (!isset($_GET['id']));
     $productModel->delete((int)$_GET['id']);
     header("Location: products-admin.php?success=delete"); exit();
 }
@@ -76,7 +76,7 @@ function handleAddEditAjax($productModel, $mode) {
     $data = [];
     foreach ($fields as $f) {
         if (empty($_POST[$f])) throw new Exception("El campo $f es requerido");
-        $data[$f] = $f === 'id' ? (int)$_POST[$f] : ($f === 'precio' ? (float)$_POST[$f] : trim($_POST[$f]));
+        $data[$f] = $f === 'precio' ? (float)$_POST[$f] : trim($_POST[$f]);
     }
     if ($mode === 'add') {
         if ($productModel->productExists($data['id'])) throw new Exception("ID duplicado");

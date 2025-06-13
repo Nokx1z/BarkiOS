@@ -72,7 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 function loadProductForEdit(btn) {
-    document.getElementById('editProductId').value = btn.getAttribute('data-id') || '';
+    const id = btn.getAttribute('data-id') || '';
+    document.getElementById('editProductId').value = id; // visible, disabled
+    document.getElementById('editProductIdHidden').value = id; // hidden, enviado al backend
     document.getElementById('editProductName').value = btn.getAttribute('data-nombre') || '';
     document.getElementById('editProductCategory').value = btn.getAttribute('data-categoria') || '';
     document.getElementById('editProductType').value = btn.getAttribute('data-tipo') || '';

@@ -169,6 +169,7 @@
                                 disabled>
                             <div class="invalid-feedback">Por favor ingrese un código válido</div>
                         </div>
+                        <input type="hidden" name="id" id="editProductIdHidden">
                     <div class="mb-3">
                         <label class="form-label">Nombre</label>
                         <input type="text" class="form-control" 
