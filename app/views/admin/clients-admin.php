@@ -152,7 +152,9 @@
                         minlength="7"
                         pattern="^\d{7,9}$"
                         oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,9);"
+                        readonly
                         disabled>
+                    <input type="hidden" id="editClientCedulaHidden" name="cedula" value="">
                     <div class="invalid-feedback">Por favor ingrese una cédula válida (7 a 9 dígitos)</div>
                     <div class="mb-3">
                         <label class="form-label">Nombre</label>
