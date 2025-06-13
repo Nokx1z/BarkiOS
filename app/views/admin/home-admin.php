@@ -1,3 +1,4 @@
+<?php $pageTitle = "Inicio | Garage Barki"; ?>
 <?= require_once __DIR__ . '/../partials/header-admin.php'; ?>
 <!-- Barra lateral de navegación -->
 <?= require_once __DIR__ . '/../partials/navbar-admin.php'; ?> 

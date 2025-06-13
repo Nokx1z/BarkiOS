@@ -31,7 +31,7 @@ class FrontController {
             array_shift($segments);
         }
 
-        $this->controller = $this->sanitize($segments[0] ?? 'home');
+        $this->controller = $this->sanitize($segments[0] ?? 'login');
         $this->action = $this->sanitize($segments[1] ?? 'index');
         $this->params = array_slice($segments, 2);
     }

@@ -1,271 +1,113 @@
 <?php
-use Barkios\models\Clients;
-$clientsModel = new Clients();
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// filepath: c:\xampp\htdocs\BarkiOS\app\controllers\Admin\ProductsController.php
 
-handleRequest($clientsModel);
-/**
- * Controlador para la gestión de clientes en el área de administración
- * 
- * Maneja las operaciones CRUD para los clientes, incluyendo:
- * - Listado de clientes
- * - Agregar nuevos clientes
- * - Eliminar clientes existentes
- */
-/**
- * Muestra la vista principal de administración de clientes
- */
+use Barkios\models\Clients;
+use Barkios\models\Product;
+$clienttModel = new Clients();
+
 function index() {
-        $clientsModel = new Clients();
-        $clientss = $clientsModel->getAll(); // Cambia getAll() por el método real si es diferente
-    require __DIR__ . '/../../views/admin/clients-admin.php';
+   return null;
 }
-/**
- * Maneja las peticiones entrantes y las redirige al método correspondiente
- * 
- * Detecta el tipo de petición (GET/POST) y la acción solicitada,
- * luego llama al método correspondiente para manejar la acción
- */
- function handleRequest($clientsModel) {
+handleRequest($clienttModel);
+
+function handleRequest($clientModel) {
     $action = $_GET['action'] ?? '';
-    $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-             strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+    $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
     try {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
-            handleAddclients($clientsModel);
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit') {
-            handleEditclients($clientsModel); // <-- Agrega esta función para editar por POST normal
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit_ajax') {
-            handleEditClientAjax($clientsModel); // <-- Ya tienes esta función para AJAX
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'delete') {
-            handleDeleteclients($clientsModel);
-        } else if ($isAjax) {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Acción no válida']);
-            exit();
+        if ($isAjax) {
+            header('Content-Type: application/json; charset=utf-8');
+            switch ("{$_SERVER['REQUEST_METHOD']}_$action") {
+                case 'POST_add_ajax':    handleAddEditAjax($clientModel, 'add'); break;
+                case 'POST_edit_ajax':   handleAddEditAjax($clientModel, 'edit'); break;
+                case 'POST_delete_ajax': handleDeleteAjax($clientModel); break;
+                case 'GET_get_clients': getClientsAjax($clientModel); break;
+                default:                 echo json_encode(['success'=>false,'message'=>'Acción inválida']); exit();
+            }
+        } else {
+            switch ("{$_SERVER['REQUEST_METHOD']}_$action") {
+                case 'POST_add':    handleAddEdit($clientModel, 'add'); break;
+                case 'POST_edit':   handleAddEdit($clientModel, 'edit'); break;
+                case 'GET_delete':  handleDelete($clientModel); break;
+                default:            require __DIR__ . '/../../views/admin/clients-admin.php';
+            }
         }
     } catch (Exception $e) {
         if ($isAjax) {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-            exit();
+            http_response_code(500);
+            echo json_encode(['success'=>false, 'message'=>$e->getMessage()]);
         } else {
             die("Error: " . $e->getMessage());
         }
-    }
-}
-
-/**
- * Obtiene todos los clientes
- * 
- * @return array Lista de clientes
- */
-function getclientss($clientsModel) {
-    return $clientsModel->getAll();
-}
-
-/**
- * Maneja la adición de un nuevo cliente
- * 
- * Procesa el formulario de agregar cliente, valida los datos
- * y devuelve una respuesta JSON si es una petición AJAX
- * o redirige a la página correspondiente en caso contrario
- */
-function handleAddclients($clientsModel) {
-    $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-             strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
-    
-    $response = ['success' => false, 'message' => ''];
-    
-    try {
-        if (ob_get_length()) ob_clean();
-        $required = ['cedula', 'nombre', 'direccion', 'telefono', 'membresia'];
-        foreach ($required as $field) {
-            if (empty($_POST[$field])) {
-                throw new Exception("El campo $field es requerido");
-            }
-        }
-        $cedula = htmlspecialchars(trim($_POST['cedula']));
-        $nombre = htmlspecialchars(trim($_POST['nombre']));
-        $direccion = htmlspecialchars(trim($_POST['direccion']));
-        $telefono = htmlspecialchars(trim($_POST['telefono']));
-        $membresia = htmlspecialchars(trim($_POST['membresia']));
-        // Verifica si ya existe antes de insertar
-        if ($clientsModel->clientExists($cedula)) {
-            throw new Exception("Ya existe un cliente con esta cédula");
-        }
-        // Insertar el cliente
-        $success = $clientsModel->add($cedula, $nombre, $direccion, $telefono, $membresia);
-        if ($success) {
-            $response['success'] = true;
-            $response['message'] = 'Cliente agregado correctamente';
-            $response['cliente'] = [
-                'cedula' => $cedula,
-                'nombre' => $nombre,
-                'direccion' => $direccion,
-                'telefono' => $telefono,
-                'membresia' => $membresia
-            ];
-        } else {
-            throw new Exception("Error al agregar el cliente");
-        }
-    } catch (Exception $e) {
-        $response['message'] = $e->getMessage();
-    }
-    
-    if ($isAjax) {
-        header('Content-Type: application/json');
-        echo json_encode($response);
         exit();
+    }
+}
+
+function handleAddEdit($clientModel, $mode) {
+    $fields = ['cedula','nombre','direccion','telefono','membresia'];
+    foreach ($fields as $f) {
+        if (empty($_POST[$f])) throw new Exception("El campo $f es requerido");
+    }
+    $cedula = trim($_POST['cedula']);
+    $nombre = trim($_POST['nombre']);
+    $direccion = trim($_POST['direccion']);
+    $telefono = trim($_POST['telefono']);
+    $membresia = trim($_POST['membresia']); // <-- CORREGIDO
+
+    if ($mode === 'add') {
+        if ($clientModel->clientExists($cedula)) {
+            header("Location: clients-admin.php?error=cedula_duplicada&cedula=$cedula"); exit();
+        }
+        $clientModel->add($cedula, $nombre, $direccion, $telefono, $membresia);
+        header("Location: clients-admin.php?success=add"); exit();
     } else {
-        if ($response['success']) {
-            header("Location: clients-admin.php?success=add");
-        } else {
-            header("Location: clients-admin.php?error=" . urlencode($response['message']) . "&cedula=" . urlencode($_POST['cedula'] ?? ''));
-        }
-        exit();
+        $clientModel->update($cedula, $nombre, $direccion, $telefono, $membresia);
+        header("Location: clients-admin.php?success=edit"); exit();
     }
 }
 
-    /**
-     * Maneja la eliminación de un cliente
-     * 
-     * Procesa la solicitud de eliminación de un cliente por su cédula
-     * Devuelve una respuesta JSON si es una petición AJAX
-     * o redirige a la página correspondiente en caso contrario
-     */
-function handleDeleteclients($clientsModel) {
-    $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-             strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
-    
-    $response = ['success' => false, 'message' => ''];
-    
-    try {
-        if (ob_get_length()) ob_clean();
-        if (!isset($_GET['cedula']) || empty($_GET['cedula'])) {
-            throw new Exception("Cédula de cliente inválida");
-        }
-        $cedula = $_GET['cedula'];
-        $success = $clientsModel->delete($cedula);
-        if ($success) {
-            $response['success'] = true;
-            $response['message'] = 'Cliente eliminado correctamente';
-            $response['cedula'] = $cedula;
-        } else {
-            throw new Exception("Error al eliminar el cliente");
-        }
-    } catch (Exception $e) {
-        $response['message'] = $e->getMessage();
+function handleDelete($productModel) {
+    if (!isset($_GET['cedula']) || !is_numeric($_GET['cedula'])) throw new Exception("cedula inválida");
+    $productModel->delete((int)$_GET['cedula']);
+    header("Location: clients-admin.php?success=delete"); exit();
+}
+
+
+function handleAddEditAjax($clientModel, $mode) {
+    $fields = ['cedula','nombre','direccion','telefono','membresia'];
+    $data = [];
+    foreach ($fields as $f) {
+        if (empty($_POST[$f])) throw new Exception("El campo $f es requerido");
+        $data[$f] = trim($_POST[$f]); // <-- Solo texto
     }
-    
-    if ($isAjax) {
-        header('Content-Type: application/json');
-        echo json_encode($response);
-        exit();
+    if ($mode === 'add') {
+        if ($clientModel->clientExists($data['cedula'])) throw new Exception("cedula duplicada");
+        $clientModel->add(...array_values($data));
+        $msg = 'Cliente agregado';
     } else {
-        if ($response['success']) {
-            header("Location: clients-admin.php?success=delete");
-        } else {
-            header("Location: clients-admin.php?error=" . urlencode($response['message']));
-        }
-        exit();
+        if (!$clientModel->clientExists($data['cedula'])) throw new Exception("No existe la cedula");
+        $clientModel->update(...array_values($data));
+        $msg = 'Cedula actualizada';
     }
+    $client = $clientModel->getById($data['cedula']);
+    echo json_encode(['success'=>true, 'message'=>$msg, 'client'=>$client]); exit();
 }
 
-/**
- * Maneja la edición de un cliente existente
- * 
- * Procesa el formulario de edición de cliente, valida los datos
- * y devuelve una respuesta JSON si es una petición AJAX
- * o redirige a la página correspondiente en caso contrario
- */
-function handleEditClientAjax($clientModel) {
-    header('Content-Type: application/json; charset=utf-8');
-
-    try {
-        $required = ['cedula', 'nombre', 'direccion', 'telefono', 'membresia'];
-        $data = [];
-        foreach ($required as $field) {
-            if (empty($_POST[$field])) {
-                throw new Exception("El campo $field es requerido");
-            }
-            $data[$field] = htmlspecialchars(trim($_POST[$field]));
-        }
-
-        if (!$clientModel->clientExists($data['cedula'])) {
-            throw new Exception("El cliente no existe");
-        }
-
-        $success = $clientModel->update(
-            $data['cedula'],
-            $data['nombre'],
-            $data['direccion'],
-            $data['telefono'],
-            $data['membresia']
-        );
-
-        if ($success) {
-            $client = $clientModel->getById($data['cedula']);
-            echo json_encode([
-                'success' => true,
-                'message' => 'Cliente actualizado correctamente',
-                'client' => $client // <-- clave correcta
-            ]);
-            exit();
-        } else {
-            throw new Exception("Error al actualizar el cliente");
-        }
-    } catch (Exception $e) {
-        http_response_code(400);
-        echo json_encode([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
-    }
-    exit();
+function handleDeleteAjax($clientModel) {
+    if (empty($_POST['cedula']) || !is_numeric($_POST['cedula'])) throw new Exception("Cedula inválida");
+    $cedula = trim($_POST['cedula']);
+    if (!$clientModel->clientExists($cedula)) throw new Exception("No existe el producto");
+    $clientModel->delete($cedula);
+    echo json_encode(['success'=>true, 'message'=>'Cliente eliminado', 'clientId'=>$cedula]); exit();
 }
 
-/**
- * Maneja la edición de un cliente existente
- * 
- * Procesa el formulario de edición de cliente, valida los datos
- * y devuelve una respuesta JSON si es una petición AJAX
- * o redirige a la página correspondiente en caso contrario
- */
-function handleEditclients($clientsModel) {
-    $response = ['success' => false, 'message' => ''];
-    try {
-        $required = ['cedula', 'nombre', 'direccion', 'telefono', 'membresia'];
-        foreach ($required as $field) {
-            if (empty($_POST[$field])) {
-                throw new Exception("El campo $field es requerido");
-            }
-        }
-        $cedula = htmlspecialchars(trim($_POST['cedula']));
-        $nombre = htmlspecialchars(trim($_POST['nombre']));
-        $direccion = htmlspecialchars(trim($_POST['direccion']));
-        $telefono = htmlspecialchars(trim($_POST['telefono']));
-        $membresia = htmlspecialchars(trim($_POST['membresia']));
-
-        if (!$clientsModel->clientExists($cedula)) {
-            throw new Exception("El cliente no existe");
-        }
-        $success = $clientsModel->update($cedula, $nombre, $direccion, $telefono, $membresia);
-        if ($success) {
-            $response['success'] = true;
-            $response['message'] = 'Cliente actualizado correctamente';
-        } else {
-            throw new Exception("Error al actualizar el cliente");
-        }
-    } catch (Exception $e) {
-        $response['message'] = $e->getMessage();
+function getClientsAjax($clientModel) {
+    if (isset($_GET['cedula'])) {
+        $client = $clientModel->getById(trim($_GET['cedula']));
+        if (!$client) throw new Exception("No existe el producto");
+        echo json_encode(['success'=>true, 'products'=>[$client]]); exit();
     }
-    if ($response['success']) {
-        header("Location: clients-admin.php?success=edit");
-    } else {
-        header("Location: clients-admin.php?error=" . urlencode($response['message']) . "&cedula=" . urlencode($_POST['cedula'] ?? ''));
-    }
-    exit();
+    $client = $clientModel->getAll();
+    echo json_encode(['success'=>true, 'clients'=>$client, 'count'=>count($client)]); exit();
 }

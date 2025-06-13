@@ -27,19 +27,31 @@ document.addEventListener('DOMContentLoaded', () => {
                                             <div class="alert alert-info mb-0">No hay productos disponibles</div>
                                         </td>`;
             productsTableBody.innerHTML = data.products.map(p => `
-                <tr data-product-id="${p.id}">
-                    <td>${p.id}</td>
-                    <td>${escapeHtml(p.nombre)}</td>
-                    <td>${escapeHtml(p.tipo)}</td>
-                    <td>${escapeHtml(p.categoria)}</td>
-                    <td>$${parseFloat(p.precio).toFixed(2)}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary btn-edit" data-bs-toggle="modal" data-bs-target="#editProductModal" data-product-id="${p.id}"><i class="fas fa-edit"></i>Editar</button>
-                        <button class="btn btn-sm btn-outline-danger btn-delete" data-product-id="${p.id}" data-product-name="${escapeHtml(p.nombre)}"><i class="fas fa-trash"></i>Eliminar</button>
-                    </td>
-                </tr>`).join('');
+    <tr id="producto-${escapeHtml(p.id)}">
+        <td>${escapeHtml(p.id)}</td>
+        <td>${escapeHtml(p.nombre)}</td>
+        <td>${escapeHtml(p.tipo)}</td>
+        <td>${escapeHtml(p.categoria)}</td>
+        <td>$${parseFloat(p.precio).toFixed(2)}</td>
+        <td>
+            <button class="btn btn-sm btn-outline-primary btn-edit"
+                data-id="${escapeHtml(p.id)}"
+                data-nombre="${escapeHtml(p.nombre)}"
+                data-categoria="${escapeHtml(p.categoria)}"
+                data-tipo="${escapeHtml(p.tipo)}"
+                data-precio="${p.precio}">
+                <i class="fas fa-edit"></i> Editar
+            </button>
+            <button class="btn btn-sm btn-outline-danger btn-delete"
+                data-product-id="${escapeHtml(p.id)}"
+                data-product-name="${escapeHtml(p.nombre)}">
+                <i class="fas fa-trash"></i> Eliminar
+            </button>
+        </td>
+    </tr>
+`).join('');
             document.querySelectorAll('.btn-delete').forEach(btn => btn.onclick = handleDelete);
-            document.querySelectorAll('.btn-edit').forEach(btn => btn.onclick = () => loadProductForEdit(btn.dataset.productId));
+            document.querySelectorAll('.btn-edit').forEach(btn => btn.onclick = () => loadProductForEdit(btn));
         }).catch(() => showAlert('Error al cargar productos', 'danger'));
     }
 
@@ -59,19 +71,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(() => showAlert('Error al agregar', 'danger'));
     }
 
-    function loadProductForEdit(id) {
-        fetch(window.location.pathname + `?action=get_products&id=${id}`, {headers: {'X-Requested-With':'XMLHttpRequest'}})
-        .then(r => r.json()).then(data => {
-            if (data.success && data.products?.length) {
-                const p = data.products[0];
-                editProductForm.id.value = p.id;
-                editProductForm.nombre.value = p.nombre;
-                editProductForm.tipo.value = p.tipo;
-                editProductForm.categoria.value = p.categoria;
-                editProductForm.precio.value = p.precio;
-            } else showAlert('No se encontró el producto', 'danger');
-        }).catch(() => showAlert('Error al cargar producto', 'danger'));
-    }
+function loadProductForEdit(btn) {
+    document.getElementById('editProductId').value = btn.getAttribute('data-id') || '';
+    document.getElementById('editProductName').value = btn.getAttribute('data-nombre') || '';
+    document.getElementById('editProductCategory').value = btn.getAttribute('data-categoria') || '';
+    document.getElementById('editProductType').value = btn.getAttribute('data-tipo') || '';
+    document.getElementById('editProductPrice').value = btn.getAttribute('data-precio') || '';
+    const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
+    modal.show();
+}
 
     function handleEdit(e) {
         e.preventDefault();
