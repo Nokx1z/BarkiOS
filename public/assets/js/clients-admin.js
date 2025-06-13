@@ -71,11 +71,13 @@
         }
 
         function loadClientForEdit(btn) {
+            const cedula = btn.getAttribute('data-cedula') || '';
             document.getElementById('editClientCedula').value = btn.getAttribute('data-cedula') || '';
+            document.getElementById('editClientCedulaHidden').value = cedula;
             document.getElementById('editClientNombre').value = btn.getAttribute('data-nombre') || '';
-            document.getElementById('editClientApellido').value = btn.getAttribute('data-apellido') || '';
-            document.getElementById('editClientEmail').value = btn.getAttribute('data-email') || '';
+            document.getElementById('editClientDireccion').value = btn.getAttribute('data-direccion') || '';
             document.getElementById('editClientTelefono').value = btn.getAttribute('data-telefono') || '';
+            document.getElementById('editClientMembresia').value = btn.getAttribute('data-membresia') || '';
             const modal = new bootstrap.Modal(document.getElementById('editClientModal'));
             modal.show();
         }
