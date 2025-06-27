@@ -26,29 +26,29 @@
                     `<td colspan="6" class="text-center">
                         <div class="alert alert-info mb-0">No hay clientes disponibles</div>
                     </td>`;
-                clientsTableBody.innerHTML = data.clients.map(c => `
-                    <tr id="cliente-${escapeHtml(c.cedula)}">
-                        <td class="text-center">${escapeHtml(c.cedula)}</td>
-                        <td>${escapeHtml(c.nombre)}</td>
-                        <td>${escapeHtml(c.direccion)}</td>
-                        <td class="text-end">${formatearTelefono(c.telefono)}</td>
-                        <td class="text-center">${escapeHtml(c.membresia)}</td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary btn-editar"
-                                data-cedula="${escapeHtml(c.cedula)}"
-                                data-nombre="${escapeHtml(c.nombre)}"
-                                data-direccion="${escapeHtml(c.direccion)}"
-                                data-telefono="${escapeHtml(c.telefono)}"
-                                data-membresia="${escapeHtml(c.membresia)}">
-                                <i class="fas fa-edit"></i> Editar
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger btn-eliminar"
-                                data-cedula="${escapeHtml(c.cedula)}"
-                                data-nombre="${escapeHtml(c.nombre)}">
-                                <i class="fas fa-trash"></i> Eliminar
-                            </button>
-                        </td>
-                    </tr>`).join('');
+            clientsTableBody.innerHTML = data.clients.map(c => `
+                <tr id="cliente-${escapeHtml(c.cliente_ced)}">
+                    <td class="text-center">${escapeHtml(c.cliente_ced)}</td>
+                    <td>${escapeHtml(c.nombre_cliente)}</td>
+                    <td>${escapeHtml(c.direccion)}</td>
+                    <td class="text-end">${formatearTelefono(c.telefono)}</td>
+                    <td class="text-center">${escapeHtml(c.tipo)}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-primary btn-editar"
+                            data-cedula="${escapeHtml(c.cliente_ced)}"
+                            data-nombre="${escapeHtml(c.nombre_cliente)}"
+                            data-direccion="${escapeHtml(c.direccion)}"
+                            data-telefono="${escapeHtml(c.telefono)}"
+                            data-membresia="${escapeHtml(c.tipo)}">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger btn-eliminar"
+                            data-cedula="${escapeHtml(c.cliente_ced)}"
+                            data-nombre="${escapeHtml(c.nombre_cliente)}">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </td>
+                </tr>`).join('');
                 document.querySelectorAll('.btn-eliminar').forEach(btn => btn.onclick = handleDelete);
                 document.querySelectorAll('.btn-editar').forEach(btn => btn.onclick = () => loadClientForEdit(btn));
             }).catch(() => showAlert('Error al cargar clientes', 'danger'));

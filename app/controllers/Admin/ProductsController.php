@@ -2,6 +2,9 @@
 // filepath: c:\xampp\htdocs\BarkiOS\app\controllers\Admin\ProductsController.php
 use Barkios\models\Product;
 $productModel = new Product();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 function index() {
    return null;
@@ -43,11 +46,11 @@ function handleRequest($productModel) {
 }
 
 function handleAddEdit($productModel, $mode) {
-    $fields = ['id','nombre','tipo','categoria','precio'];
+    $fields = ['prenda_id','nombre','tipo','categoria','precio'];
     foreach ($fields as $f) {
         if (empty($_POST[$f])) throw new Exception("El campo $f es requerido");
     }
-    $id = (int)$_POST['id'];
+    $id = (int)$_POST['prenda_id'];
     $nombre = trim($_POST['nombre']);
     $tipo = trim($_POST['tipo']);
     $categoria = trim($_POST['categoria']);
@@ -55,7 +58,7 @@ function handleAddEdit($productModel, $mode) {
 
     if ($mode === 'add') {
         if ($productModel->productExists($id)) {
-            header("Location: products-admin.php?error=id_duplicado&id=$id"); exit();
+            header("Location: products-admin.php?error=id_duplicado&prenda_id=$id"); exit();
         }
         $productModel->add($id, $nombre, $tipo, $categoria, $precio);
         header("Location: products-admin.php?success=add"); exit();
@@ -66,42 +69,43 @@ function handleAddEdit($productModel, $mode) {
 }
 
 function handleDelete($productModel) {
-    if (!isset($_GET['id']) || !is_numeric($_GET['id'])) throw new Exception("ID inválido");
-    $productModel->delete((int)$_GET['id']);
+    if (!isset($_GET['prenda_id']) || !is_numeric($_GET['prenda_id'])) throw new Exception("ID inválido");
+    $productModel->delete((int)$_GET['prenda_id']);
     header("Location: products-admin.php?success=delete"); exit();
 }
 
 function handleAddEditAjax($productModel, $mode) {
-    $fields = ['id','nombre','tipo','categoria','precio'];
+    $fields = ['prenda_id','nombre','tipo','categoria','precio'];
     $data = [];
     foreach ($fields as $f) {
         if (empty($_POST[$f])) throw new Exception("El campo $f es requerido");
-        $data[$f] = $f === 'id' ? (int)$_POST[$f] : ($f === 'precio' ? (float)$_POST[$f] : trim($_POST[$f]));
+        $data[$f] = $f === 'precio' ? (float)$_POST[$f] : trim($_POST[$f]);
     }
+    $id = $data['prenda_id'];
     if ($mode === 'add') {
-        if ($productModel->productExists($data['id'])) throw new Exception("ID duplicado");
-        $productModel->add(...array_values($data));
+        if ($productModel->productExists($id)) throw new Exception("ID duplicado");
+        $productModel->add($id, $data['nombre'], $data['tipo'], $data['categoria'], $data['precio']);
         $msg = 'Producto agregado';
     } else {
-        if (!$productModel->productExists($data['id'])) throw new Exception("No existe el producto");
-        $productModel->update(...array_values($data));
+        if (!$productModel->productExists($id)) throw new Exception("No existe el producto");
+        $productModel->update($id, $data['nombre'], $data['tipo'], $data['categoria'], $data['precio']);
         $msg = 'Producto actualizado';
     }
-    $product = $productModel->getById($data['id']);
+    $product = $productModel->getById($id);
     echo json_encode(['success'=>true, 'message'=>$msg, 'product'=>$product]); exit();
 }
 
 function handleDeleteAjax($productModel) {
-    if (empty($_POST['id']) || !is_numeric($_POST['id'])) throw new Exception("ID inválido");
-    $id = (int)$_POST['id'];
+    if (empty($_POST['prenda_id']) || !is_numeric($_POST['prenda_id'])) throw new Exception("ID inválido");
+    $id = (int)$_POST['prenda_id'];
     if (!$productModel->productExists($id)) throw new Exception("No existe el producto");
     $productModel->delete($id);
     echo json_encode(['success'=>true, 'message'=>'Producto eliminado', 'productId'=>$id]); exit();
 }
 
 function getProductsAjax($productModel) {
-    if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-        $product = $productModel->getById((int)$_GET['id']);
+    if (isset($_GET['prenda_id']) && is_numeric($_GET['prenda_id'])) {
+        $product = $productModel->getById((int)$_GET['prenda_id']);
         if (!$product) throw new Exception("No existe el producto");
         echo json_encode(['success'=>true, 'products'=>[$product]]); exit();
     }

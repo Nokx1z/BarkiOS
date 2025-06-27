@@ -22,28 +22,29 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="spinner-border text-primary"></div> Cargando...</td></tr>`;
         fetch(window.location.pathname + '?action=get_products', {headers: {'X-Requested-With':'XMLHttpRequest'}})
         .then(r => r.json()).then(data => {
+            
             if (!data.products?.length) return productsTableBody.innerHTML =
                 `<td colspan="6" class="text-center">
                                             <div class="alert alert-info mb-0">No hay productos disponibles</div>
                                         </td>`;
             productsTableBody.innerHTML = data.products.map(p => `
-    <tr id="producto-${escapeHtml(p.id)}">
-        <td>${escapeHtml(p.id)}</td>
+    <tr id="producto-${escapeHtml(p.prenda_id)}">
+        <td>${escapeHtml(p.prenda_id)}</td>
         <td>${escapeHtml(p.nombre)}</td>
         <td>${escapeHtml(p.tipo)}</td>
         <td>${escapeHtml(p.categoria)}</td>
         <td>$${parseFloat(p.precio).toFixed(2)}</td>
         <td>
             <button class="btn btn-sm btn-outline-primary btn-edit"
-                data-id="${escapeHtml(p.id)}"
+                data-id="${escapeHtml(p.prenda_id)}"
                 data-nombre="${escapeHtml(p.nombre)}"
-                data-categoria="${escapeHtml(p.categoria)}"
                 data-tipo="${escapeHtml(p.tipo)}"
+                data-categoria="${escapeHtml(p.categoria)}"
                 data-precio="${p.precio}">
                 <i class="fas fa-edit"></i> Editar
             </button>
             <button class="btn btn-sm btn-outline-danger btn-delete"
-                data-product-id="${escapeHtml(p.id)}"
+                data-product-id="${escapeHtml(p.prenda_id)}"
                 data-product-name="${escapeHtml(p.nombre)}">
                 <i class="fas fa-trash"></i> Eliminar
             </button>
@@ -97,7 +98,7 @@ function loadProductForEdit(btn) {
     }
 
     function handleDelete(e) {
-        const id = e.currentTarget.dataset.productId;
+        const prenda_id = e.currentTarget.dataset.productId;
         const name = e.currentTarget.dataset.productName;
         Swal.fire({
             title: '¿Eliminar producto?',
@@ -109,7 +110,7 @@ function loadProductForEdit(btn) {
                 fetch('index.php?controller=products&action=delete_ajax', {
                     method: 'POST',
                     headers: {'X-Requested-With':'XMLHttpRequest','Content-Type':'application/x-www-form-urlencoded'},
-                    body: `id=${encodeURIComponent(id)}`
+                    body: `prenda_id=${encodeURIComponent(prenda_id)}`
                 }).then(r => r.json()).then(data => {
                     if (data.success) {
                         showAlert('Producto eliminado', 'success');

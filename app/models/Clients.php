@@ -19,7 +19,7 @@ class Clients extends Database {
      */
     public function getAll() {
         try {
-            $stmt = $this->db->query("SELECT * FROM clientes ORDER BY cedula ASC");
+            $stmt = $this->db->query("SELECT * FROM clientes ORDER BY cliente_ced ASC");
             return $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
         } catch (\Throwable $e) {
             return [];
@@ -33,8 +33,8 @@ class Clients extends Database {
      * @return bool True si existe, false si no.
      */
     public function clientExists($cedula) {
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM clientes WHERE cedula = :cedula");
-        $stmt->execute([':cedula' => $cedula]);
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM clientes WHERE cliente_ced = :cliente_ced");
+        $stmt->execute([':cliente_ced' => $cedula]);
         return $stmt->fetchColumn() > 0;
     }
 
@@ -45,8 +45,8 @@ class Clients extends Database {
      * @return array|null Array asociativo con los datos del producto o null si no existe.
      */
     public function getById($cedula) {
-        $stmt = $this->db->prepare("SELECT * FROM clientes WHERE cedula = :cedula");
-        $stmt->execute([':cedula' => $cedula]);
+        $stmt = $this->db->prepare("SELECT * FROM clientes WHERE cliente_ced = :cliente_ced");
+        $stmt->execute([':cliente_ced' => $cedula]);
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
@@ -62,16 +62,24 @@ class Clients extends Database {
      * @throws Exception Si el producto ya existe.
      */
     public function add($cedula, $nombre, $direccion, $telefono, $membresia) {
-        if ($this->clientExists($cedula)) throw new Exception("Ya existe un cliente con esta cedula");
-        $stmt = $this->db->prepare("INSERT INTO clientes (cedula, nombre, direccion, telefono, membresia) VALUES (:cedula, :nombre, :direccion, :telefono, :membresia)");
+        if ($this->clientExists($cedula)) {
+            throw new Exception("Ya existe un cliente con esta cédula");
+        }
+
+        $stmt = $this->db->prepare("
+            INSERT INTO clientes (cliente_ced, nombre_cliente, direccion, telefono, tipo)
+            VALUES (:cliente_ced, :nombre_cliente, :direccion, :telefono, :tipo)
+        ");
+
         return $stmt->execute([
-            ':cedula' => $cedula,
-            ':nombre' => $nombre,
+            ':cliente_ced' => $cedula,
+            ':nombre_cliente' => $nombre,
             ':direccion' => $direccion,
             ':telefono' => $telefono,
-            ':membresia' => $membresia
+            ':tipo' => $membresia
         ]);
     }
+
 
     /**
      * Actualiza un producto existente.
@@ -86,13 +94,13 @@ class Clients extends Database {
      */
     public function update($cedula, $nombre, $direccion, $telefono, $membresia) {
         if (!$this->clientExists($cedula)) throw new Exception("No existe un cliente con esta cedula");
-        $stmt = $this->db->prepare("UPDATE clientes SET nombre = :nombre, direccion = :direccion, telefono = :telefono, membresia = :membresia WHERE cedula = :cedula");
+        $stmt = $this->db->prepare("UPDATE clientes SET nombre_cliente = :nombre_cliente, direccion = :direccion, telefono = :telefono, tipo = :tipo WHERE cedula = :cedula");
         return $stmt->execute([
-            ':cedula' => $cedula,
-            ':nombre' => $nombre,
+            ':cliente_ced' => $cedula,
+            ':nombre_cliente' => $nombre,
             ':direccion' => $direccion,
             ':telefono' => $telefono,
-            ':membresia' => $membresia
+            ':tipo' => $membresia
         ]);
     }
 

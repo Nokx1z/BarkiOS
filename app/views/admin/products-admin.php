@@ -1,10 +1,7 @@
 <?php $pageTitle = "Productos | Garage Barki"; ?>
 <?php require_once __DIR__ . '/../partials/header-admin.php'; ?>
-
-<?= require_once __DIR__ . '/../partials/header-admin.php'; ?>
 <!-- Barra lateral de navegación -->
 <?= require_once __DIR__ . '/../partials/navbar-admin.php'; ?> 
-
 <div class="main-content">
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -63,12 +60,12 @@
                             <label class="form-label">Código</label>
                             <input type="text" class="form-control" 
                             id="productId"
-                            name="id" 
+                            name="prenda_id" 
                             placeholder="Ingrese código del producto" 
                             inputmode="numeric"
                             maxlength="9"
                             minlength="9"
-                            pattern="^\d{9}$"
+                            pattern="^\d{0,9}$"
                             oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,9);"
                             required>
                             <div class="invalid-feedback">Por favor ingrese un código válido</div>
@@ -92,9 +89,9 @@
                                 <option value="Formal">Formal</option>
                                 <option value="Casual">Casual</option>
                                 <option value="Deportivo">Deportivo</option>
-                                <option value="Fiesta">Fiesta</option>
                                 <option value="Invierno">Invierno</option>
                                 <option value="Verano">Verano</option>
+                                <option value="Fiesta">Fiesta</option>
                             </select>
                             <div class="invalid-feedback">Por favor seleccione una categoría</div>
                         </div>
@@ -102,13 +99,14 @@
                             <label class="form-label">Tipo de prenda</label>
                             <select class="form-select" id="productType" name="tipo" required>
                                 <option value="">Seleccione un tipo</option>
-                                <option value="vestidos">Vestidos</option>
-                                <option value="blusas">Blusas</option>
-                                <option value="pantalones">Pantalones</option>
-                                <option value="camisas">Camisas</option>
-                                <option value="faldas">Faldas</option>
-                                <option value="shorts">Shorts</option>
-                                <option value="conjuntos">Conjuntos</option>
+                                <option value="Vestido">Vestido</option>
+                                <option value="Blusa">Blusa</option>
+                                <option value="Pantalon">Pantalone</option>
+                                <option value="Camisa">Camisa</option>
+                                <option value="Falda">Falda</option>
+                                <option value="Shorts">Short</option>
+                                <option value="Enterizo">Enterizo</option>
+                                <option value="Chaqueta">Chaqueta</option>
                             </select>
                             <div class="invalid-feedback">Por favor seleccione un tipo de prenda</div>
                         </div>
@@ -159,14 +157,13 @@
                             <label class="form-label">Código</label>
                             <input type="text" class="form-control" 
                                 id="editProductId"
-                                name="id" 
+                                name="prenda_id" 
                                 placeholder="Ingrese código del producto" 
                                 inputmode="numeric"
                                 maxlength="9"
                                 minlength="9"
                                 pattern="^\d{9}$"
-                                readonly
-                                disabled>
+                                readonly>
                             <div class="invalid-feedback">Por favor ingrese un código válido</div>
                         </div>
                     <div class="mb-3">
@@ -199,13 +196,14 @@
                         <select class="form-select" name="tipo" id="editProductType" required>
                             <!-- Opciones para Tipo de prenda -->
                             <option value="">Seleccione un tipo</option>
-                            <option value="vestidos">Vestidos</option>
-                            <option value="blusas">Blusas</option>
-                            <option value="pantalones">Pantalones</option>
-                            <option value="camisas">Camisas</option>
-                            <option value="faldas">Faldas</option>
-                            <option value="shorts">Shorts</option>
-                            <option value="conjuntos">Conjuntos</option>
+                                <option value="Vestido">Vestido</option>
+                                <option value="Blusa">Blusa</option>
+                                <option value="Pantalon">Pantalon</option>
+                                <option value="Camisa">Camisa</option>
+                                <option value="Falda">Falda</option>
+                                <option value="Short">Short</option>
+                                <option value="Enterizo">Enterizo</option>
+                                <option value="Chaqueta">Chaqueta</option>
                         </select>
                         <div class="invalid-feedback">Por favor seleccione un tipo de prenda</div>
                     </div>

@@ -8,18 +8,18 @@ use Exception;
 /**
  * Modelo Product
  * 
- * Proporciona métodos para gestionar productos en la base de datos,
+ * Proporciona métodos para gestionar prendas en la base de datos,
  * incluyendo operaciones CRUD y utilidades de consulta.
  */
 class Product extends Database {
     /**
-     * Obtiene todos los productos registrados en la base de datos.
+     * Obtiene todos los prendas registrados en la base de datos.
      * 
-     * @return array Lista de productos (cada producto es un array asociativo).
+     * @return array Lista de prendas (cada producto es un array asociativo).
      */
     public function getAll() {
         try {
-            $stmt = $this->db->query("SELECT * FROM productos ORDER BY id ASC");
+            $stmt = $this->db->query("SELECT * FROM prendas ORDER BY prenda_id ASC");
             return $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
         } catch (\Throwable $e) {
             return [];
@@ -33,8 +33,8 @@ class Product extends Database {
      * @return bool True si existe, false si no.
      */
     public function productExists($id) {
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM productos WHERE id = :id");
-        $stmt->execute([':id' => $id]);
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM prendas WHERE prenda_id = :prenda_id");
+        $stmt->execute([':prenda_id' => $id]);
         return $stmt->fetchColumn() > 0;
     }
 
@@ -45,8 +45,8 @@ class Product extends Database {
      * @return array|null Array asociativo con los datos del producto o null si no existe.
      */
     public function getById($id) {
-        $stmt = $this->db->prepare("SELECT * FROM productos WHERE id = :id");
-        $stmt->execute([':id' => $id]);
+        $stmt = $this->db->prepare("SELECT * FROM prendas WHERE prenda_id = :prenda_id");
+        $stmt->execute([':prenda_id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
@@ -63,9 +63,9 @@ class Product extends Database {
      */
     public function add($id, $nombre, $tipo, $categoria, $precio) {
         if ($this->productExists($id)) throw new Exception("Ya existe un producto con este ID");
-        $stmt = $this->db->prepare("INSERT INTO productos (id, nombre, tipo, categoria, precio) VALUES (:id, :nombre, :tipo, :categoria, :precio)");
+        $stmt = $this->db->prepare("INSERT INTO prendas (prenda_id, nombre, tipo, categoria, precio) VALUES (:prenda_id, :nombre, :tipo, :categoria, :precio)");
         return $stmt->execute([
-            ':id' => $id,
+            ':prenda_id' => $id,
             ':nombre' => $nombre,
             ':tipo' => $tipo,
             ':categoria' => $categoria,
@@ -86,9 +86,9 @@ class Product extends Database {
      */
     public function update($id, $nombre, $tipo, $categoria, $precio) {
         if (!$this->productExists($id)) throw new Exception("No existe un producto con este ID");
-        $stmt = $this->db->prepare("UPDATE productos SET nombre = :nombre, tipo = :tipo, categoria = :categoria, precio = :precio WHERE id = :id");
+        $stmt = $this->db->prepare("UPDATE prendas SET nombre = :nombre, tipo = :tipo, categoria = :categoria, precio = :precio WHERE prenda_id = :prenda_id");
         return $stmt->execute([
-            ':id' => $id,
+            ':prenda_id' => $id,
             ':nombre' => $nombre,
             ':tipo' => $tipo,
             ':categoria' => $categoria,
@@ -103,7 +103,8 @@ class Product extends Database {
      * @return bool True si se eliminó correctamente, false en caso contrario.
      */
     public function delete($id) {
-        $stmt = $this->db->prepare("DELETE FROM productos WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+        $stmt = $this->db->prepare("DELETE FROM prendas WHERE prenda_id = :prenda_id");
+        return $stmt->execute([':prenda_id' => $id]);
     }
+    
 }
