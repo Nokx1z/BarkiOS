@@ -13,8 +13,8 @@
             <i class="fas fa-plus me-1"></i> Agregar cliente
         </button>
         
-        <!-- Mensajes de éxito/error dinámicos -->
-        <div id="alertContainer" class="mt-3"></div>
+        <!-- Mensajes de éxito/error dinámicos (ya no se usa, todo es pop-up con SweetAlert2) -->
+        <!-- <div id="alertContainer" class="mt-3"></div> -->
 
         <!-- Tabla de Clientes -->
         <div class="card mt-3">

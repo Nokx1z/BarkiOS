@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     const productsTableBody = document.getElementById('productsTableBody');
-    const alertContainer = document.getElementById('alertContainer');
     const addProductForm = document.getElementById('addProductForm');
     const editProductForm = document.getElementById('editProductForm');
 
@@ -8,12 +7,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const escapeHtml = str => String(str ?? '')
         .replace(/&/g, '&amp;').replace(/</g, '&lt;')
         .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    // showAlert ahora usa SweetAlert2 (pop-up)
     const showAlert = (msg, type = 'info') => {
-        alertContainer.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${msg}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-        setTimeout(() => alertContainer.innerHTML = '', 4000);
+        let icon = 'info';
+        if (type === 'success') icon = 'success';
+        else if (type === 'danger' || type === 'error') icon = 'error';
+        else if (type === 'warning') icon = 'warning';
+        Swal.fire({
+            text: msg,
+            icon: icon,
+            timer: 3000,
+            showConfirmButton: false,
+            timerProgressBar: true,
+            position: 'top',
+            toast: true
+        });
     };
 
     // CRUD AJAX

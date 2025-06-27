@@ -94,7 +94,7 @@ class Clients extends Database {
      */
     public function update($cedula, $nombre, $direccion, $telefono, $membresia) {
         if (!$this->clientExists($cedula)) throw new Exception("No existe un cliente con esta cedula");
-        $stmt = $this->db->prepare("UPDATE clientes SET nombre_cliente = :nombre_cliente, direccion = :direccion, telefono = :telefono, tipo = :tipo WHERE cedula = :cedula");
+        $stmt = $this->db->prepare("UPDATE clientes SET nombre_cliente = :nombre_cliente, direccion = :direccion, telefono = :telefono, tipo = :tipo WHERE cliente_ced = :cliente_ced");
         return $stmt->execute([
             ':cliente_ced' => $cedula,
             ':nombre_cliente' => $nombre,
@@ -111,7 +111,7 @@ class Clients extends Database {
      * @return bool True si se eliminó correctamente, false en caso contrario.
      */
     public function delete($cedula) {
-        $stmt = $this->db->prepare("DELETE FROM clientes WHERE cedula = :cedula");
-        return $stmt->execute([':cedula' => $cedula]);
+        $stmt = $this->db->prepare("DELETE FROM clientes WHERE cliente_ced = :cliente_ced");
+        return $stmt->execute([':cliente_ced' => $cedula]);
     }
 }

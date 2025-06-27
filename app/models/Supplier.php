@@ -15,14 +15,14 @@ class Supplier extends Database{
 
   
     public function supplierExists($id) {
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM proveedores WHERE id = :id");
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM proveedores WHERE proveedor_rif = :proveedor_rif");
         $stmt->execute([':id' => $id]);
         return $stmt->fetchColumn() > 0;
     }
 
  
     public function getById($id) {
-        $stmt = $this->db->prepare("SELECT * FROM proveedores WHERE id = :id");
+        $stmt = $this->db->prepare("SELECT * FROM proveedores WHERE proveedor_rif = :proveedor_rif");
         $stmt->execute([':id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
@@ -34,7 +34,7 @@ class Supplier extends Database{
         }
         try {
             $stmt = $this->db->prepare("
-                INSERT INTO proveedores (id, nombre_contacto, nombre_empresa, direccion, tipo_rif)
+                INSERT INTO proveedores (proveedor_rif, nombre_empresa, nombre_contacto, telefono)
                 VALUES (:id, :nombre_contacto, :nombre_empresa, :direccion, :tipo_rif)
             ");
             return $stmt->execute([
