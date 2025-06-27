@@ -19,7 +19,7 @@
   "homepage": "https://github.com/Nokx1z/BarkiOS#readme",
   "devDependencies": {
     "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.6",
+    "bootstrap": "^5.3.7",
     "sass": "^1.89.0"
   }
 }
