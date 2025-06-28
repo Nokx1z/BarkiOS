@@ -116,7 +116,7 @@ function getSupplierr($supplierModel) {
  * @return void
  */
 function handleAddSupplier($supplierModel) {
-    $required = ['id', 'nombre_contacto', 'nombre_empresa', 'direccion', 'tipo_rif'];
+    $required = ['proveedor_rif', 'nombre_contacto', 'nombre_empresa', 'direccion', 'tipo_rif'];
     foreach ($required as $field) {
         if (empty($_POST[$field])) {
             throw new Exception("El campo $field es requerido");

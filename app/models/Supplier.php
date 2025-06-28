@@ -14,31 +14,31 @@ class Supplier extends Database{
     }
 
   
-    public function supplierExists($id) {
+    public function supplierExists($proveedor_rif) {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM proveedores WHERE proveedor_rif = :proveedor_rif");
-        $stmt->execute([':id' => $id]);
+        $stmt->execute([':proveedor_rif' => $proveedor_rif]);
         return $stmt->fetchColumn() > 0;
     }
 
  
-    public function getById($id) {
+    public function getById($proveedor_rif) {
         $stmt = $this->db->prepare("SELECT * FROM proveedores WHERE proveedor_rif = :proveedor_rif");
-        $stmt->execute([':id' => $id]);
+        $stmt->execute([':proveedor_rif' => $proveedor_rif]);
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
     
-    public function add($id, $nombre_contacto, $nombre_empresa, $direccion, $tipo_rif) {
-        if ($this->supplierExists($id)) {
+    public function add($proveedor_rif, $nombre_contacto, $nombre_empresa, $direccion, $tipo_rif) {
+        if ($this->supplierExists($proveedor_rif)) {
             throw new Exception("Ya existe un proveedor con este RIF");
         }
         try {
             $stmt = $this->db->prepare("
-                INSERT INTO proveedores (proveedor_rif, nombre_empresa, nombre_contacto, telefono)
-                VALUES (:id, :nombre_contacto, :nombre_empresa, :direccion, :tipo_rif)
+                INSERT INTO proveedores (proveedor_rif, nombre_empresa, nombre_contacto, direccion, tipo_rif)
+                VALUES (:proveedor_rif, :nombre_empresa, :nombre_contacto, :direccion, :tipo_rif)
             ");
             return $stmt->execute([
-                ':id' => $id,
+                ':proveedor_rif' => $proveedor_rif,
                 ':nombre_contacto' => $nombre_contacto,
                 ':nombre_empresa' => $nombre_empresa,
                 ':direccion' => $direccion,
@@ -51,8 +51,8 @@ class Supplier extends Database{
     }
 
 
-    public function update($id, $nombre_contacto, $nombre_empresa, $direccion, $tipo_rif) {
-        if (!$this->supplierExists($id)) {
+    public function update($proveedor_rif, $nombre_contacto, $nombre_empresa, $direccion, $tipo_rif) {
+        if (!$this->supplierExists($proveedor_rif)) {
             throw new Exception("No existe un proveedor con este RIF");
         }
         $stmt = $this->db->prepare("
@@ -61,10 +61,10 @@ class Supplier extends Database{
                 nombre_empresa = :nombre_empresa,
                 direccion = :direccion,
                 tipo_rif = :tipo_rif
-            WHERE id = :id
+            WHERE proveedor_rif = :proveedor_rif
         ");
         return $stmt->execute([
-            ':id' => $id,
+            ':proveedor_rif' => $proveedor_rif,
             ':nombre_contacto' => $nombre_contacto,
             ':nombre_empresa' => $nombre_empresa,
             ':direccion' => $direccion,
@@ -72,8 +72,8 @@ class Supplier extends Database{
         ]);
     }
 
-    public function delete($id) {
-        $stmt = $this->db->prepare("DELETE FROM proveedores WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+    public function delete($proveedor_rif) {
+        $stmt = $this->db->prepare("DELETE FROM proveedores WHERE proveedor_rif = :proveedor_rif");
+        return $stmt->execute([':proveedor_rif' => $proveedor_rif]);
     }
 }
