@@ -194,16 +194,7 @@
                     <div class="mb-3">
                         <label class="form-label">Tipo de prenda</label>
                         <select class="form-select" name="tipo" id="editProductType" required>
-                            <!-- Opciones para Tipo de prenda -->
                             <option value="">Seleccione un tipo</option>
-                                <option value="Vestido">Vestido</option>
-                                <option value="Blusa">Blusa</option>
-                                <option value="Pantalon">Pantalon</option>
-                                <option value="Camisa">Camisa</option>
-                                <option value="Falda">Falda</option>
-                                <option value="Short">Short</option>
-                                <option value="Enterizo">Enterizo</option>
-                                <option value="Chaqueta">Chaqueta</option>
                         </select>
                         <div class="invalid-feedback">Por favor seleccione un tipo de prenda</div>
                     </div>

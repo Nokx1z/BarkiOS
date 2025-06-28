@@ -3,6 +3,44 @@ document.addEventListener('DOMContentLoaded', () => {
     const addProductForm = document.getElementById('addProductForm');
     const editProductForm = document.getElementById('editProductForm');
 
+    // --- Tipos de prenda por categoría ---
+    const tiposPorCategoria = {
+        Formal:    ["Vestido", "Camisa", "Pantalon", "Chaqueta"],
+        Casual:    ["Blusa", "Pantalon", "Short", "Falda"],
+        Deportivo: ["Short", "Falda", "Chaqueta"],
+        Invierno:  ["Chaqueta", "Pantalon"],
+        Verano:    ["Vestido", "Short", "Blusa"],
+        Fiesta:    ["Vestido", "Falda", "Blusa", "Enterizo"]
+    };
+
+    function actualizarTipos(selectCategoria, selectTipo) {
+        const categoria = selectCategoria.value;
+        selectTipo.innerHTML = '<option value="">Seleccione un tipo</option>';
+        if (tiposPorCategoria[categoria]) {
+            tiposPorCategoria[categoria].forEach(tipo => {
+                const opt = document.createElement('option');
+                opt.value = tipo;
+                opt.textContent = tipo;
+                selectTipo.appendChild(opt);
+            });
+        }
+    }
+
+    // Para el formulario de agregar
+    const catAdd = document.getElementById('productCategory');
+    const tipoAdd = document.getElementById('productType');
+    if (catAdd && tipoAdd) {
+        catAdd.addEventListener('change', () => actualizarTipos(catAdd, tipoAdd));
+    }
+
+    // Para el formulario de editar
+    const catEdit = document.getElementById('editProductCategory');
+    const tipoEdit = document.getElementById('editProductType');
+    if (catEdit && tipoEdit) {
+        catEdit.addEventListener('change', () => actualizarTipos(catEdit, tipoEdit));
+    }
+    // --- Fin dependencias tipo-categoría ---
+
     // Utilidades
     const escapeHtml = str => String(str ?? '')
         .replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -80,15 +118,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(() => showAlert('Error al agregar', 'danger'));
     }
 
-function loadProductForEdit(btn) {
-    document.getElementById('editProductId').value = btn.getAttribute('data-id') || '';
-    document.getElementById('editProductName').value = btn.getAttribute('data-nombre') || '';
-    document.getElementById('editProductCategory').value = btn.getAttribute('data-categoria') || '';
-    document.getElementById('editProductType').value = btn.getAttribute('data-tipo') || '';
-    document.getElementById('editProductPrice').value = btn.getAttribute('data-precio') || '';
-    const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
-    modal.show();
-}
+    function loadProductForEdit(btn) {
+        document.getElementById('editProductId').value = btn.getAttribute('data-id') || '';
+        document.getElementById('editProductName').value = btn.getAttribute('data-nombre') || '';
+        document.getElementById('editProductCategory').value = btn.getAttribute('data-categoria') || '';
+        // Actualiza tipos según la categoría seleccionada
+        actualizarTipos(catEdit, tipoEdit);
+        document.getElementById('editProductType').value = btn.getAttribute('data-tipo') || '';
+        document.getElementById('editProductPrice').value = btn.getAttribute('data-precio') || '';
+        const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
+        modal.show();
+    }
 
     function handleEdit(e) {
         e.preventDefault();

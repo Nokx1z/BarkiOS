@@ -134,6 +134,7 @@
             </div>
             <form id="editSupplierForm">
                 <input type="hidden" name="id" id="editSupplierId">
+                <input type="hidden" name="proveedor_rif" id="editSupplierRifHidden">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Tipo de RIF</label>
@@ -146,7 +147,7 @@
                     <div class="mb-3">
                         <label class="form-label">RIF</label>
                         <input type="text" class="form-control"
-                            name="id"
+                            name="proveedor_rif"
                             id="editSupplierRif"
                             maxlength="9"
                             minlength="9"
