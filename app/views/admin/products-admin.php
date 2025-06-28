@@ -12,7 +12,7 @@
         </button>
         
         <!-- Mensajes de éxito/error dinámicos -->
-        <div id="alertContainer" class="mt-3"></div>
+        <!-- <div id="alertContainer" class="mt-3"></div> -->
 
         <!-- Tabla de Productos -->
         <div class="card mt-3">
