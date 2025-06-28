@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadProductForEdit(btn) {
         document.getElementById('editProductId').value = btn.getAttribute('data-id') || '';
+        document.getElementById('editProductIdHidden').value = btn.getAttribute('data-id') || '';
         document.getElementById('editProductName').value = btn.getAttribute('data-nombre') || '';
         document.getElementById('editProductCategory').value = btn.getAttribute('data-categoria') || '';
         // Actualiza tipos según la categoría seleccionada

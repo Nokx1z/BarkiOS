@@ -6,20 +6,20 @@ use PDO;
 use Exception;
 
 /**
- * Modelo Product
+ * Modelo Clients
  * 
- * Proporciona métodos para gestionar productos en la base de datos,
+ * Proporciona métodos para gestionar clientes en la base de datos,
  * incluyendo operaciones CRUD y utilidades de consulta.
  */
 class Clients extends Database {
     /**
-     * Obtiene todos los productos registrados en la base de datos.
+     * Obtiene todos los clientes activos registrados en la base de datos.
      * 
-     * @return array Lista de productos (cada producto es un array asociativo).
+     * @return array Lista de clientes (cada cliente es un array asociativo).
      */
     public function getAll() {
         try {
-            $stmt = $this->db->query("SELECT * FROM clientes ORDER BY cliente_ced ASC");
+            $stmt = $this->db->query("SELECT * FROM clientes WHERE activo = 1 ORDER BY cliente_ced ASC");
             return $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
         } catch (\Throwable $e) {
             return [];
@@ -27,9 +27,9 @@ class Clients extends Database {
     }
 
     /**
-     * Verifica si un producto existe por su ID.
+     * Verifica si un cliente existe por su cédula.
      * 
-     * @param int $id ID del producto.
+     * @param int|string $cedula Cédula del cliente.
      * @return bool True si existe, false si no.
      */
     public function clientExists($cedula) {
@@ -39,10 +39,10 @@ class Clients extends Database {
     }
 
     /**
-     * Obtiene un producto por su ID.
+     * Obtiene un cliente por su cédula.
      * 
-     * @param int $id ID del producto.
-     * @return array|null Array asociativo con los datos del producto o null si no existe.
+     * @param int|string $cedula Cédula del cliente.
+     * @return array|null Array asociativo con los datos del cliente o null si no existe.
      */
     public function getById($cedula) {
         $stmt = $this->db->prepare("SELECT * FROM clientes WHERE cliente_ced = :cliente_ced");
@@ -51,26 +51,24 @@ class Clients extends Database {
     }
 
     /**
-     * Agrega un nuevo producto a la base de datos.
+     * Agrega un nuevo cliente a la base de datos.
      * 
-     * @param int $id
-     * @param string $nombre
-     * @param string $tipo
-     * @param string $categoria
-     * @param float $precio
+     * @param int|string $cedula Cédula del cliente.
+     * @param string $nombre Nombre del cliente.
+     * @param string $direccion Dirección del cliente.
+     * @param string $telefono Teléfono del cliente.
+     * @param string $membresia Tipo de membresía del cliente.
      * @return bool True si se insertó correctamente, false en caso contrario.
-     * @throws Exception Si el producto ya existe.
+     * @throws Exception Si el cliente ya existe.
      */
     public function add($cedula, $nombre, $direccion, $telefono, $membresia) {
         if ($this->clientExists($cedula)) {
             throw new Exception("Ya existe un cliente con esta cédula");
         }
-
         $stmt = $this->db->prepare("
             INSERT INTO clientes (cliente_ced, nombre_cliente, direccion, telefono, tipo)
             VALUES (:cliente_ced, :nombre_cliente, :direccion, :telefono, :tipo)
         ");
-
         return $stmt->execute([
             ':cliente_ced' => $cedula,
             ':nombre_cliente' => $nombre,
@@ -80,17 +78,16 @@ class Clients extends Database {
         ]);
     }
 
-
     /**
-     * Actualiza un producto existente.
+     * Actualiza los datos de un cliente existente.
      * 
-     * @param int $id
-     * @param string $nombre
-     * @param string $tipo
-     * @param string $categoria
-     * @param float $precio
+     * @param int|string $cedula Cédula del cliente.
+     * @param string $nombre Nombre del cliente.
+     * @param string $direccion Dirección del cliente.
+     * @param string $telefono Teléfono del cliente.
+     * @param string $membresia Tipo de membresía del cliente.
      * @return bool True si se actualizó correctamente, false en caso contrario.
-     * @throws Exception Si el producto no existe.
+     * @throws Exception Si el cliente no existe.
      */
     public function update($cedula, $nombre, $direccion, $telefono, $membresia) {
         if (!$this->clientExists($cedula)) throw new Exception("No existe un cliente con esta cedula");
@@ -105,13 +102,13 @@ class Clients extends Database {
     }
 
     /**
-     * Elimina un producto por su ID.
+     * Elimina lógicamente un cliente por su cédula (marcándolo como inactivo).
      * 
-     * @param int $id ID del producto a eliminar.
+     * @param int|string $cedula Cédula del cliente a eliminar.
      * @return bool True si se eliminó correctamente, false en caso contrario.
      */
     public function delete($cedula) {
-        $stmt = $this->db->prepare("DELETE FROM clientes WHERE cliente_ced = :cliente_ced");
+        $stmt = $this->db->prepare("UPDATE clientes SET activo = 0 WHERE cliente_ced = :cliente_ced");
         return $stmt->execute([':cliente_ced' => $cedula]);
     }
 }

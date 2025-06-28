@@ -149,23 +149,22 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editProductForm">
+                <input type="hidden" name="prenda_id" id="editProductIdHidden">
                 <div class="modal-body">
                     <div id="editProductErrors" class="alert alert-danger d-none"></div>
                     <div class="mb-3">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Código</label>
-                            <input type="text" class="form-control" 
-                                id="editProductId"
-                                name="prenda_id" 
-                                placeholder="Ingrese código del producto" 
-                                inputmode="numeric"
-                                maxlength="9"
-                                minlength="9"
-                                pattern="^\d{9}$"
-                                readonly>
-                            <div class="invalid-feedback">Por favor ingrese un código válido</div>
-                        </div>
+                        <label class="form-label">Código</label>
+                        <input type="text" class="form-control" 
+                            id="editProductId"
+                            name="prenda_id" 
+                            placeholder="Ingrese código del producto" 
+                            inputmode="numeric"
+                            maxlength="9"
+                            minlength="9"
+                            pattern="^\d{9}$"
+                            disabled>
+                        <div class="invalid-feedback">Por favor ingrese un código válido</div>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label">Nombre</label>
                         <input type="text" class="form-control" 

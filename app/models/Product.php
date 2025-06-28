@@ -13,13 +13,13 @@ use Exception;
  */
 class Product extends Database {
     /**
-     * Obtiene todos los prendas registrados en la base de datos.
+     * Obtiene todos los productos activos registrados en la base de datos.
      * 
-     * @return array Lista de prendas (cada producto es un array asociativo).
+     * @return array Lista de productos (cada producto es un array asociativo).
      */
     public function getAll() {
         try {
-            $stmt = $this->db->query("SELECT * FROM prendas ORDER BY prenda_id ASC");
+            $stmt = $this->db->query("SELECT * FROM prendas WHERE activo = 1 ORDER BY prenda_id ASC");
             return $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
         } catch (\Throwable $e) {
             return [];
@@ -53,11 +53,11 @@ class Product extends Database {
     /**
      * Agrega un nuevo producto a la base de datos.
      * 
-     * @param int $id
-     * @param string $nombre
-     * @param string $tipo
-     * @param string $categoria
-     * @param float $precio
+     * @param int $id ID del producto.
+     * @param string $nombre Nombre del producto.
+     * @param string $tipo Tipo de prenda.
+     * @param string $categoria Categoría de la prenda.
+     * @param float $precio Precio del producto.
      * @return bool True si se insertó correctamente, false en caso contrario.
      * @throws Exception Si el producto ya existe.
      */
@@ -76,11 +76,11 @@ class Product extends Database {
     /**
      * Actualiza un producto existente.
      * 
-     * @param int $id
-     * @param string $nombre
-     * @param string $tipo
-     * @param string $categoria
-     * @param float $precio
+     * @param int $id ID del producto.
+     * @param string $nombre Nombre del producto.
+     * @param string $tipo Tipo de prenda.
+     * @param string $categoria Categoría de la prenda.
+     * @param float $precio Precio del producto.
      * @return bool True si se actualizó correctamente, false en caso contrario.
      * @throws Exception Si el producto no existe.
      */
@@ -97,13 +97,13 @@ class Product extends Database {
     }
 
     /**
-     * Elimina un producto por su ID.
+     * Elimina lógicamente un producto por su ID (marcándolo como inactivo).
      * 
      * @param int $id ID del producto a eliminar.
      * @return bool True si se eliminó correctamente, false en caso contrario.
      */
     public function delete($id) {
-        $stmt = $this->db->prepare("DELETE FROM prendas WHERE prenda_id = :prenda_id");
+        $stmt = $this->db->prepare("UPDATE prendas SET activo = 0 WHERE prenda_id = :prenda_id");
         return $stmt->execute([':prenda_id' => $id]);
     }
     
