@@ -34,15 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="alert alert-info mb-0">No hay proveedores disponibles</div>
                 </td>`;
             suppliersTableBody.innerHTML = data.suppliers.map(s => `
-                <tr id="proveedor-${escapeHtml(s.id)}">
-                    <td>${escapeHtml(s.tipo_rif)}-${escapeHtml(s.id)}</td>
+                <tr id="proveedor-${escapeHtml(s.proveedor_rif)}">
+                    <td>${escapeHtml(s.tipo_rif)}-${escapeHtml(s.proveedor_rif)}</td>
                     <td>${escapeHtml(s.tipo_rif)}</td>
                     <td>${escapeHtml(s.nombre_contacto)}</td>
                     <td>${escapeHtml(s.nombre_empresa)}</td>
                     <td>${escapeHtml(s.direccion)}</td>
                     <td class="text-center">
                         <button class="btn btn-sm btn-outline-primary btn-editar"
-                            data-id="${escapeHtml(s.id)}"
+                            data-proveedor_rif="${escapeHtml(s.proveedor_rif)}"
                             data-tipo_rif="${escapeHtml(s.tipo_rif)}"
                             data-nombre_contacto="${escapeHtml(s.nombre_contacto)}"
                             data-nombre_empresa="${escapeHtml(s.nombre_empresa)}"
@@ -50,14 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             <i class="fas fa-edit"></i> Editar
                         </button>
                         <button class="btn btn-sm btn-outline-danger btn-eliminar"
-                            data-id="${escapeHtml(s.id)}"
+                            data-proveedor_rif="${escapeHtml(s.proveedor_rif)}"
                             data-nombre="${escapeHtml(s.nombre_contacto)}">
                             <i class="fas fa-trash"></i> Eliminar
                         </button>
                     </td>
                 </tr>`).join('');
             document.querySelectorAll('.btn-eliminar').forEach(btn => btn.onclick = handleDelete);
-            document.querySelectorAll('.btn-editar').forEach(btn => btn.onclick = () => loadSupplierForEdit(btn));
+            document.querySelectorAll('.btn-editar').forEach(btn => btn.onclick = loadSupplierForEdit);
         }).catch(() => showAlert('Error al cargar proveedores', 'danger'));
     }
 
@@ -78,10 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(() => showAlert('Error al agregar', 'danger'));
     }
 
-    function loadSupplierForEdit(btn) {
-        document.getElementById('editSupplierId').value = btn.getAttribute('data-id');
+    function loadSupplierForEdit(e) {
+        // Permitir que funcione tanto si recibe un evento como un botón
+        const btn = e.currentTarget || e;
+        document.getElementById('editSupplierRif').value = btn.getAttribute('data-proveedor_rif');
+        document.getElementById('editSupplierRifHidden').value = btn.getAttribute('data-proveedor_rif');
         document.getElementById('editSupplierTipoRif').value = btn.getAttribute('data-tipo_rif');
-        document.getElementById('editSupplierRif').value = btn.getAttribute('data-id');
         document.getElementById('editSupplierNombreContacto').value = btn.getAttribute('data-nombre_contacto');
         document.getElementById('editSupplierNombreEmpresa').value = btn.getAttribute('data-nombre_empresa');
         document.getElementById('editSupplierDireccion').value = btn.getAttribute('data-direccion');
@@ -106,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleDelete(e) {
-        const id = e.currentTarget.dataset.id;
+        const proveedor_rif = e.currentTarget.dataset.proveedor_rif;
         const nombre = e.currentTarget.dataset.nombre;
         Swal.fire({
             title: '¿Eliminar proveedor?',
@@ -118,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetch('supplier-admin.php?action=delete_ajax', {
                     method: 'POST',
                     headers: {'X-Requested-With':'XMLHttpRequest','Content-Type':'application/x-www-form-urlencoded'},
-                    body: `id=${encodeURIComponent(id)}`
+                    body: `proveedor_rif=${encodeURIComponent(proveedor_rif)}`
                 }).then(r => r.json()).then(data => {
                     if (data.success) {
                         showAlert('Proveedor eliminado', 'success');

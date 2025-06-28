@@ -68,7 +68,7 @@
                 <div class="mb-3">
                     <label class="form-label">RIF</label>
                     <input type="text" class="form-control"
-                        name="id"
+                        name="proveedor_rif"
                         id="supplierRif"
                         placeholder="Ingrese el RIF (solo números)"
                         maxlength="9"

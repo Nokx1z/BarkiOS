@@ -122,7 +122,7 @@ function handleAddSupplier($supplierModel) {
             throw new Exception("El campo $field es requerido");
         }
     }
-    $rif = trim($_POST['id']);
+    $rif = trim($_POST['proveedor_rif']);
     $nombre_contacto = htmlspecialchars(trim($_POST['nombre_contacto']));
     $nombre_empresa = htmlspecialchars(trim($_POST['nombre_empresa']));
     $direccion = htmlspecialchars(trim($_POST['direccion']));
@@ -154,10 +154,11 @@ function handleAddSupplier($supplierModel) {
  * @return void
  */
 function handleDeleteSupplier($supplierModel) {
-    if (!isset($_GET['id'])) {
-        throw new Exception("ID de producto inválido");
+    if (!isset($_GET['proveedor_rif'])) {
+        throw new Exception("ID de proveedor inválido");
     }
-    $success = $supplierModel->delete((int)$_GET['id']);
+    $rif = trim($_GET['proveedor_rif']);
+    $success = $supplierModel->delete($rif);
     if ($success) {
         header('Location: supplier-admin.php?success=delete');
         exit();
@@ -176,7 +177,7 @@ function handleDeleteSupplier($supplierModel) {
  */
 function handleAddSupplierAjax($supplierModel) {
     try {
-        $required = ['id', 'nombre_contacto', 'nombre_empresa', 'direccion', 'tipo_rif'];
+        $required = ['proveedor_rif', 'nombre_contacto', 'nombre_empresa', 'direccion', 'tipo_rif'];
         $data = [];
         
         // Validar campos requeridos
@@ -187,9 +188,9 @@ function handleAddSupplierAjax($supplierModel) {
             $data[$field] = trim($_POST[$field]);
         }
         // Validar formato del RIF
-        $rif = trim($data['id']);
-        if (strlen($data['id']) !== 9) {
-            throw new Exception("El RIF debe tener exactamente 9 dígitos");
+        $rif = $data['proveedor_rif'];
+        if (strlen($rif) !== 9) {
+            throw new Exception("El RIF debe tener exactamente 9 caracteres");
         }
         
         // Verificar duplicado
@@ -225,17 +226,15 @@ function handleAddSupplierAjax($supplierModel) {
 
 function handleDeleteSupplierAjax($supplierModel) {
     try {
-        if (!isset($_POST['id']) || !is_numeric($_POST['id'])) {
-            throw new Exception('ID de proveedor inválido');
+        if (!isset($_POST['proveedor_rif']) || strlen(trim($_POST['proveedor_rif'])) !== 9) {
+            throw new Exception('RIF de proveedor inválido');
         }
-        $id = trim($_POST['id']);
-        
+        $rif = trim($_POST['proveedor_rif']);
         // Verificar existencia
-        if (!$supplierModel->supplierExists($id)) {
+        if (!$supplierModel->supplierExists($rif)) {
             throw new Exception('El proveedor que intentas eliminar no existe');
         }
-        
-        $success = $supplierModel->delete($id);
+        $success = $supplierModel->delete($rif);
         if (!$success) {
             throw new Exception('No se pudo eliminar el proveedor. Inténtalo de nuevo.');
         }
@@ -275,7 +274,7 @@ function getSuppliersAjax($supplierModel) {
 function handleEditSupplierAjax($supplierModel) {
     header('Content-Type: application/json; charset=utf-8');
     try {
-        $required = ['id', 'nombre_contacto', 'nombre_empresa', 'direccion', 'tipo_rif'];
+        $required = ['proveedor_rif', 'nombre_contacto', 'nombre_empresa', 'direccion', 'tipo_rif'];
         $data = [];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
@@ -283,13 +282,12 @@ function handleEditSupplierAjax($supplierModel) {
             }
             $data[$field] = trim($_POST[$field]);
         }
-
-        if (!$supplierModel->supplierExists($data['id'])) {
+        $rif = $data['proveedor_rif'];
+        if (!$supplierModel->supplierExists($rif)) {
             throw new Exception("El proveedor no existe");
         }
-
         $success = $supplierModel->update(
-            $data['id'],
+            $rif,
             $data['nombre_contacto'],
             $data['nombre_empresa'],
             $data['direccion'],
@@ -297,7 +295,7 @@ function handleEditSupplierAjax($supplierModel) {
         );
 
         if ($success) {
-            $supplier = $supplierModel->getById($data['id']);
+            $supplier = $supplierModel->getById($rif);
             echo json_encode([
                 'success' => true,
                 'message' => 'Proveedor actualizado correctamente',
